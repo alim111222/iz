@@ -1257,6 +1257,10 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
 
   let DAYS = [];
   const sortDays = () => DAYS.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach((d, i) => d.num = i + 1);
+  // номер дня входит в обложку: перерисовываем обложки, у которых номер устарел
+  async function refreshCovers() {
+    for (const d of DAYS) if (d.coverNum !== d.num) { try { d.cover = await renderCover(d); d.coverNum = d.num; await store.put(d); } catch (e) { console.warn(e); } }
+  }
 
   /* ---------- возможности платформы (если страница открыта как артефакт) ---------- */
   const cap = { tts: null, downloads: null };
@@ -1412,12 +1416,12 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
     btnBusy('#rebuild', true);
     const nd = await processDay({ date: d.date, text: d.text, photos: d.photos, song: d.song, demo: d.demo, title: title && title !== d.title ? title : (d.titleLocked ? d.title : ''), forceTech: forced }, d);
     nd.forceTech = forced; delete nd.video;
-    DAYS = DAYS.map(x => x.id === d.id ? nd : x); sortDays(); await store.put(nd); btnBusy('#rebuild', false); route(); toast('День пересобран');
+    nd.coverNum = null; DAYS = DAYS.map(x => x.id === d.id ? nd : x); sortDays(); await store.put(nd); await refreshCovers(); btnBusy('#rebuild', false); route(); toast('День пересобран');
   });
   $('#delete').addEventListener('click', async () => {
     if (!player) return; const b = $('#delete');
     if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = 'Точно удалить?'; setTimeout(() => { delete b.dataset.sure; b.textContent = 'Удалить день'; }, 3000); return; }
-    const id = player.day.id; DAYS = DAYS.filter(x => x.id !== id); sortDays(); await store.del(id); location.hash = 'diary';
+    const id = player.day.id; DAYS = DAYS.filter(x => x.id !== id); sortDays(); await store.del(id); await refreshCovers(); location.hash = 'diary';
   });
 
   /* ---------- экспорт: видео и папка ---------- */
@@ -1490,7 +1494,7 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
     try {
       await fontsReady;
       const day = await processDay({ date: $('#fDate').value, text, photos: newPhotos.slice(), song, title: $('#fTitle').value.trim() });
-      DAYS.push(day); sortDays(); await store.put(day);
+      DAYS.push(day); sortDays(); await store.put(day); await refreshCovers();
       newPhotos = []; thumbs(); $('#newForm').reset(); $('#fDate').value = now.toISOString().slice(0, 16); $('#songLinkBox').hidden = false; $('#songFileBox').hidden = true;
       location.hash = 'day-' + day.id;
     } catch (ex) { console.error(ex); $('#formErr').textContent = 'Не получилось собрать день: ' + ex.message; }
@@ -1512,7 +1516,7 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
     $('#loader').hidden = false;
     const inputs = await IZ.demo.buildDemoInputs((i, n) => $('#loaderText').textContent = `Готовлю демо-дни: ${i + 1} из ${n}…`);
     for (const inp of inputs) { const d = await processDay(inp); DAYS.push(d); await store.put(d); }
-    sortDays(); $('#loader').hidden = true;
+    sortDays(); await refreshCovers(); $('#loader').hidden = true;
   }
   $('#resetDemo').addEventListener('click', async () => {
     const b = $('#resetDemo'); if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = 'Стереть всё и вернуть демо?'; setTimeout(() => { delete b.dataset.sure; b.textContent = 'Сбросить к демо'; }, 3000); return; }
@@ -1527,7 +1531,7 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
     await store.open(); await fontsReady;
     DAYS = await store.all();
     if (!DAYS.length) await seedDemo();
-    sortDays(); route();
+    sortDays(); await refreshCovers(); route();
     G.IZ_APP = { DAYS: () => DAYS, processDay, framesFor, store };
   })();
 })(window);
