@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Із — дневник атмосферы дня</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--paper:#f3eee5;--paper2:#ebe4d7;--ink:#1d1b19;--dim:#6f675d;--line:#cfc6b8;--acc:#b8322a;
+  --serif:"Cormorant Garamond",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace;--hand:"Caveat",cursive;--grot:"Unbounded",system-ui,sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+body{background-image:radial-gradient(rgba(90,70,50,.06) 1px,transparent 1px);background-size:5px 5px}
+a{color:inherit}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.02em}.dim{color:var(--dim)}
+header{display:flex;align-items:center;gap:24px;padding:18px clamp(16px,4vw,48px);border-bottom:1px solid var(--ink);position:sticky;top:0;background:rgba(243,238,229,.94);backdrop-filter:blur(6px);z-index:5}
+.logo{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1;text-decoration:none}
+.logo small{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--dim);margin-left:10px;letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.nav a{font-family:var(--mono);font-size:13px;text-decoration:none;padding:7px 12px;border:1px solid transparent;border-radius:999px}
+.nav a.on{border-color:var(--ink)}.nav a:hover{background:var(--paper2)}
+.nav a.cta{background:var(--ink);color:var(--paper)}
+main{padding:28px clamp(16px,4vw,48px) 80px;max-width:1500px;margin:0 auto}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.05;margin:0 0 8px}
+h1{font-size:clamp(34px,5vw,56px)}h2{font-size:30px}h3{font-size:24px}
+.lead{max-width:760px;color:var(--dim);margin:0 0 22px}
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 22px}
+input,textarea,select{font:inherit;color:inherit;background:#fbf8f2;border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+textarea{min-height:170px;resize:vertical;font-family:var(--serif);font-size:20px;line-height:1.4}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--ink);outline-offset:1px}
+.bar input,.bar select{width:auto;min-width:200px}
+button,.btn{font:500 14px var(--mono);border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button.primary{background:var(--ink);color:var(--paper)}button:disabled{opacity:.5;cursor:wait}
+button:hover:not(:disabled){transform:translateY(-1px)}
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px}
+.card{display:block;text-decoration:none;transition:transform .2s}
+.card:hover{transform:translateY(-4px) rotate(-.4deg)}
+.card img{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;box-shadow:0 1px 0 var(--line),0 14px 30px -18px rgba(40,30,20,.6);border-radius:3px}
+.cap{display:flex;flex-direction:column;gap:2px;padding:10px 2px}.cap b{font-family:var(--serif);font-size:20px;line-height:1.1;font-weight:600}
+.empty{font-family:var(--serif);font-size:24px}
+.day{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:36px;align-items:start}
+.stagewrap{position:sticky;top:96px}
+#stage{width:100%;aspect-ratio:9/16;display:block;border-radius:4px;box-shadow:0 20px 50px -25px rgba(40,30,20,.7);background:#ddd}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.panel{border-top:1px solid var(--ink);padding:14px 0 18px}
+.panel h3{display:flex;justify-content:space-between;align-items:baseline}
+.folder{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:13px}
+.folder li{display:grid;grid-template-columns:26px 1fr auto;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.folder i{color:var(--dim);font-style:normal}
+.why{margin:0;padding:0;list-style:none}.why li{padding:8px 0;border-bottom:1px dashed var(--line)}
+.why b{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;display:block;color:var(--dim)}
+.scores div{display:grid;grid-template-columns:190px 1fr;gap:8px;align-items:center;font-size:13px;margin:3px 0}
+.scores i{display:block;height:8px;background:var(--ink);border-radius:4px}
+.palette{display:flex;gap:6px;margin:6px 0}.palette span{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}.palette .acc{border-radius:4px}
+.inputs div{padding:6px 0;font-size:14px}.inputs b{font-family:var(--mono);font-size:12px;text-transform:uppercase;margin-right:6px}
+.daytext{font-family:var(--serif);font-size:21px;line-height:1.4;white-space:pre-wrap}
+.edit{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.form{display:grid;grid-template-columns:1.2fr 1fr;gap:28px}
+.field{margin-bottom:16px}.field label,.lab{display:block;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.drop{border:1.5px dashed var(--ink);border-radius:10px;padding:18px;text-align:center;cursor:pointer;background:#fbf8f2}.drop.over{background:var(--paper2)}
+.drop input{display:none}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.thumbs figure{margin:0;position:relative}.thumbs img{width:84px;height:105px;object-fit:cover;border-radius:4px}
+.thumbs button{position:absolute;top:-8px;right:-8px;width:24px;height:24px;padding:0;justify-content:center;background:var(--paper)}
+.seg{display:flex;gap:6px;margin-bottom:10px}.seg label{font:13px var(--mono);border:1px solid var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.seg input{display:none}.seg input:checked+span{font-weight:600}.seg label:has(input:checked){background:var(--ink);color:var(--paper)}
+.err{color:var(--acc);font-family:var(--mono);font-size:13px;min-height:18px}
+.note{font-size:13px;color:var(--dim);border-left:2px solid var(--line);padding-left:10px}
+.techlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.techlist article{border-top:1px solid var(--ink);padding-top:12px}
+.mini{display:flex;gap:6px}.mini img{width:62px;aspect-ratio:9/16;object-fit:cover;border-radius:2px}
+.rules{columns:2 340px;column-gap:36px}.rules p{break-inside:avoid;margin:0 0 12px}
+.loader{position:fixed;inset:0;background:rgba(243,238,229,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:20;font-family:var(--serif);font-size:26px}
+.loader .dot{width:16px;height:16px;border-radius:50%;background:var(--ink);animation:p 1s infinite alternate}@keyframes p{to{transform:scale(.4);opacity:.3}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,30px);background:var(--ink);color:var(--paper);font:13px var(--mono);padding:10px 16px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;z-index:30}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clamp(16px,4vw,48px);border-top:1px solid var(--line)}
+@media (max-width:860px){.day,.form{grid-template-columns:1fr}.stagewrap{position:static}.edit{grid-template-columns:1fr}.logo small{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#diary">Із<small>дневник атмосферы дня</small></a>
+  <nav class="nav"><a href="#diary">Дневник</a><a href="#system">Визуальная система</a><a href="#new" class="cta">+ Записать день</a></nav>
+</header>
+<main>
+  <section id="v-diary" class="view" hidden>
+    <h1>Дневник</h1>
+    <p class="lead">Каждый день — отдельная папка: запись, фото, песня, воспоминание и озвучка. Все страницы подчиняются одной системе, но каждая выглядит по-своему — так, как ощущался день. <span id="count" class="mono"></span></p>
+    <div class="bar"><input id="search" type="search" placeholder="Найти день: «море», «мама», «осень»…"><select id="techFilter"><option value="">Все приёмы</option><option value="monet">Свет Моне</option><option value="kandinsky">Геометрия Кандинского</option><option value="matisse">Вырезки Матисса</option><option value="ma">Ма — пустота</option><option value="film">Плёнка</option></select><span class="mono dim" id="storeNote"></span></div>
+    <div id="feed" class="feed"></div>
+    <p style="margin-top:40px"><button id="resetDemo">Сбросить к демо</button></p>
+  </section>
+
+  <section id="v-day" class="view" hidden>
+    <div class="day">
+      <div class="stagewrap">
+        <canvas id="stage" width="720" height="1280"></canvas>
+        <div class="controls"><button id="play" class="primary">▶ Смотреть</button><button id="restart">↺</button><button id="voice">🗣 Озвучить</button><span id="time" class="mono dim"></span></div>
+        <div class="controls"><button id="record">● Видео .webm</button><button id="zip">⬇ Папка дня .zip</button></div>
+        <p id="songLink" class="mono"></p>
+      </div>
+      <div>
+        <p class="mono dim" id="dayMeta"></p>
+        <h1 id="dayTitle"></h1>
+        <p class="daytext" id="dayText"></p>
+        <div class="panel"><h3><span id="folderName"></span><span class="mono dim">папка дня</span></h3><ul class="folder" id="folder"></ul></div>
+        <div class="panel"><h3>Почему этот день выглядит так<span class="mono dim">объяснимая логика</span></h3><div class="palette" id="palette"></div><ul class="why" id="why"></ul></div>
+        <div class="panel"><h3>Что система прочитала во вводе</h3><div class="inputs" id="inputs"></div>
+          <p class="note">Оценка настроения — это художественная интерпретация для оформления, а не психологическая или медицинская диагностика.</p></div>
+        <div class="panel"><h3>Правка</h3>
+          <div class="edit"><div><span class="lab">Название папки</span><input id="titleEdit"></div>
+          <div><span class="lab">Приём</span><select id="techPick"><option value="">Автоматически (по правилам)</option><option value="monet">Свет Моне</option><option value="kandinsky">Геометрия Кандинского</option><option value="matisse">Вырезки Матисса</option><option value="ma">Ма — пустота</option><option value="film">Плёнка</option></select></div>
+          <button id="rebuild">Пересобрать</button></div>
+          <p style="margin-top:16px"><button id="delete">Удалить день</button></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-new" class="view" hidden>
+    <h1>Как прошёл день?</h1>
+    <p class="lead">Расскажите так, как рассказали бы близкому другу: погода, свет, запахи, звуки, кто был рядом. Добавьте фото и песню, которая звучала, — из этого соберётся страница дневника.</p>
+    <form id="newForm" class="form" novalidate>
+      <div>
+        <div class="field"><label for="fText">Запись</label><textarea id="fText" placeholder="Гуляли по парку, всё в жёлтых листьях, было холодно, но мы пили какао и долго разговаривали…"></textarea></div>
+        <div class="field"><span class="lab">Фото дня</span>
+          <label class="drop" id="dropzone"><input id="fPhotos" type="file" accept="image/*" multiple>Перетащите фото сюда или нажмите, чтобы выбрать<br><span class="mono dim">одно или несколько; можно сразу бросить и аудиофайл</span></label>
+          <div class="thumbs" id="thumbs"></div></div>
+        <div class="row"><div class="field"><label for="fDate">Дата и время</label><input id="fDate" type="datetime-local"></div>
+          <div class="field"><label for="fTitle">Название (необязательно)</label><input id="fTitle" placeholder="придумаем сами"></div></div>
+      </div>
+      <div>
+        <div class="field"><span class="lab">Песня дня</span>
+          <div class="seg"><label><input type="radio" name="songKind" value="link" checked><span>Ссылка</span></label><label><input id="kFile" type="radio" name="songKind" value="file"><span>Свой аудиофайл</span></label></div>
+          <div id="songLinkBox"><input id="fUrl" type="url" placeholder="https://open.spotify.com/… · YouTube · Яндекс Музыка"><p class="note">Чужая песня не скачивается и не хранится: сохраняем ссылку, а влияние на оформление считаем по описанию ниже.</p></div>
+          <div id="songFileBox" hidden><input id="fAudio" type="file" accept="audio/*"><p class="note">Файл анализируется прямо в браузере: темп, тональность (мажор/минор), энергия, огибающая громкости.</p></div>
+        </div>
+        <div class="row"><div class="field"><label for="fArtist">Исполнитель</label><input id="fArtist" placeholder="Frank Sinatra"></div><div class="field"><label for="fSong">Название</label><input id="fSong" placeholder="Autumn in New York"></div></div>
+        <div class="row"><div class="field"><label for="fGenre">Жанр</label><input id="fGenre" placeholder="джаз, техно, фолк, поп…"></div><div class="field"><label for="fYear">Год</label><input id="fYear" inputmode="numeric" placeholder="1957"></div></div>
+        <div class="row"><div class="field"><label for="fTempo">Темп (для ссылки)</label><select id="fTempo"><option value="slow">медленный</option><option value="mid" selected>средний</option><option value="fast">быстрый</option></select></div>
+          <div class="field"><label for="fMood">Характер (для ссылки)</label><select id="fMood"><option value="">не знаю</option><option value="light">светлая, мажор</option><option value="dark">грустная, минор</option></select></div></div>
+        <p class="err" id="formErr"></p>
+        <button id="make" class="primary" type="submit">Собрать воспоминание дня →</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="v-system" class="view" hidden>
+    <h1>Визуальная система</h1>
+    <p class="lead">Дневник — серия, а не набор картинок. Постоянный слой делает ленту цельной, переменный — передаёт ощущение конкретного дня. Каждое решение выводится из ввода по явным правилам и показывается на странице дня.</p>
+    <div class="rules">
+      <p><b>Формат.</b> Вертикальная страница 9:16 (720×1280), живая: 15–45 секунд движения под песню, экспорт в .webm и обложка .png.</p>
+      <p><b>Постоянные элементы.</b> Бумага с волокнами; шапка «ІЗ · № дня» и дата моноширинным; зона фото 632×780 в одном месте; название — Cormorant Garamond или Unbounded; подпись — цитата из записи; полоса музыки — огибающая громкости песни с плейхедом; «компас дня» — точка настроения в круге (по горизонтали свет/тень, по вертикали тихо/ярко); нижняя линейка с координатами V/A/W.</p>
+      <p><b>Переменные элементы.</b> Приём обработки фото, палитра, сдвиг тепла, насыщенность, «воздух» (поля), ритм смены кадров, тип перехода, зерно, начертание названия и подписи, голос озвучки.</p>
+      <p><b>Координаты настроения.</b> Валентность V = 55% текст + 27% песня (лад, жанр) + 18% фото (свет, цвет). Энергия A = 42% текст + 43% песня (темп, плотность атак, громкость) + 15% фото (насыщенность, контраст). Тепло W — из фото, сезона, времени суток и жанра.</p>
+      <p><b>Песня управляет движением.</b> Кадр меняется каждые 8/12/16 долей (чем энергичнее день, тем чаще); у Кандинского — жёсткая нарезка в долю; у Матисса формы пружинят на сильную долю; медленная песня даёт длинные растворения и широкие поля. Минор приглушает свет, мажор открывает. Чем старше песня, тем больше зерна.</p>
+      <p><b>Названия папок.</b> Именная фраза 3–7 слов, без глаголов и эмодзи, по одной схеме: [сезон/настроение] + [место или время] + [деталь, люди или событие] — «Осенний парк и какао», «Ночь в офисе перед сдачей».</p>
+      <p><b>Голос.</b> Выбирается по приёму и координатам: тёплый и медленный для спокойных дней, живой и быстрый для насыщенных, чёткий для напряжённых, мягкий для ностальгии. Темп речи 0.8–1.15, высота от валентности.</p>
+      <p><b>Против «грустно — значит синий».</b> Приём выбирается не по одному слову: у каждого из пяти приёмов есть балл, складывающийся из координат, места, людей, погоды, эпохи песни и её звучания; второй по силе приём добавляет акцент.</p>
+    </div>
+    <h2 style="margin-top:30px">Художественные приёмы</h2>
+    <div class="techlist" id="techList"></div>
+  </section>
+</main>
+<footer>Із · прототип для Genesis Hackathon / ArtTech · всё считается локально в браузере · демо-фото нарисованы процедурно, демо-музыка синтезирована прототипом · шрифты Google Fonts (OFL), JSZip (MIT)</footer>
+<div class="loader" id="loader" hidden><div class="dot"></div><span id="loaderText">Готовлю дневник…</span></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ---- js/analyze.js ---- */
+/* Із — дневник атмосферы дня.
+ * analyze.js — разбор входа: текст (лексикон RU), фото (палитра/свет), музыка (аудиоанализ + метаданные).
+ * Всё работает локально в браузере, без внешних API. */
+(function (G) {
+  'use strict';
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+
+  /* ---------------- ТЕКСТ ---------------- */
+  const L = {
+    pos: ['счаст', 'радост', 'рад ', 'радова', 'любл', 'любим', 'хорош', 'прекрас', 'чудес', 'весел', 'смея', 'смех', 'смеял', 'улыб', 'уют', 'нежн',
+      'красив', 'класс', 'супер', 'восторг', 'обня', 'вкусн', 'праздн', 'ура', 'кайф', 'отличн', 'добр', 'мечт', 'вдохнов', 'горд', 'побед', 'тепло', 'тёпл', 'тепл',
+      'спокойн', 'светл', 'ласков', 'душевн', 'приятн', 'наслажд', 'благодар', 'волшеб', 'сказоч', 'обожа', 'здорово', 'лучш'],
+    neg: ['груст', 'печал', 'тоск', 'устал', 'плох', 'больн', 'боль', 'плак', 'слез', 'слёз', 'страш', 'тревож', 'злост', 'злил', 'бесит', 'раздраж', 'одинок', 'пуст',
+      'скуч', 'тяжел', 'тяжёл', 'ужас', 'провал', 'обид', 'прощал', 'прощан', 'расстал', 'потер', 'жаль', 'стресс', 'нерв', 'паник', 'вымот', 'выгор', 'серо', 'хмур',
+      'уезжа', 'уехал', 'последн', 'не спал', 'недосып', 'ссор', 'разочар', 'страх', 'боял', 'сыро', 'промок'],
+    hi: ['быстр', 'бежал', 'бегом', 'спеш', 'срочн', 'дедлайн', 'сдач', 'сдать', 'крич', 'танц', 'прыг', 'концерт', 'громк', 'адренал', 'драйв', 'гонк', 'стресс', 'нерв',
+      'паник', 'ура', 'восторг', 'вечерин', 'тусов', 'взрыв', 'сует', 'гроз', 'шумн', 'энерги', 'кофе', 'аврал', 'бешен', 'кипел', 'носил', 'плавал', 'нырял', 'волн',
+      'хохот', 'визж', 'мчал', 'гнал', 'горел', 'успеть', 'успел', 'не успева', 'ритм', 'бодр'],
+    lo: ['тих', 'спокой', 'медлен', 'долго', 'лениво', 'лень', 'сонн', 'уют', 'плед', 'чай', 'какао', 'тишин', 'задумч', 'мягк', 'неторопл', 'отдых', 'лежал', 'валял',
+      'читал', 'гуляли', 'гулял', 'дремал', 'молча', 'пусто', 'пустой', 'пустын', 'никого', 'неспеш', 'плавно', 'еле', 'шёпот', 'шепот', 'слушал', 'смотрел', 'сидел'],
+    nost: ['вспомн', 'детств', 'раньше', 'давно', 'когда-то', 'прощ', 'последн', 'старые', 'старый', 'бабушк', 'скучаю', 'скучать', 'ностальг', 'как в детстве', 'годы', 'плёнк', 'пленк']
+  };
+  const SEASON = [
+    ['autumn', ['осен', 'листь', 'листопад', 'жёлт', 'желт', 'октябр', 'сентябр', 'ноябр', 'багрян']],
+    ['winter', ['зим', 'снег', 'снеж', 'мороз', 'сугроб', 'лёд', 'лед ', 'гололед', 'декабр', 'январ', 'феврал', 'вьюг', 'метел']],
+    ['spring', ['весн', 'весен', 'подснеж', 'капел', 'цвету', 'цветен', 'март', 'апрел', 'мая ', 'май ', 'почки', 'сирен']],
+    ['summer', ['летн', 'летом', 'лето ', 'жар', 'пляж', 'загар', 'купал', 'июн', 'июл', 'август', 'зной', 'солнцепёк']]
+  ];
+  const TIME = [
+    ['night', ['ночь', 'ночью', 'ночн', 'полноч', 'до утра', 'бессонн', 'не спал']],
+    ['morning', ['утр', 'рассвет', 'завтрак', 'проснул']],
+    ['evening', ['вечер', 'закат', 'ужин', 'сумерк']],
+    ['day', ['днём', 'днем', 'обед', 'полдень', 'весь день', 'целый день']]
+  ];
+  // место: основа, именительный, род (m/f/n/p), предложный оборот, тип (nature/urban/home/transit)
+  const PLACES = [
+    ['парк', 'парк', 'm', 'в парке', 'nature'], ['пруд', 'пруд', 'm', 'у пруда', 'nature'], ['озер', 'озеро', 'n', 'у озера', 'nature'],
+    ['море', 'море', 'n', 'у моря', 'nature'], ['моря', 'море', 'n', 'у моря', 'nature'], ['морю', 'море', 'n', 'у моря', 'nature'], ['морем', 'море', 'n', 'у моря', 'nature'], ['пляж', 'пляж', 'm', 'на пляже', 'nature'], ['горы', 'горы', 'p', 'в горах', 'nature'], ['горах', 'горы', 'p', 'в горах', 'nature'],
+    ['лес', 'лес', 'm', 'в лесу', 'nature'], ['реч', 'река', 'f', 'у реки', 'nature'], ['рек', 'река', 'f', 'у реки', 'nature'],
+    ['степ', 'степь', 'f', 'в степи', 'nature'], ['сад ', 'сад', 'm', 'в саду', 'nature'], ['саду', 'сад', 'm', 'в саду', 'nature'], ['дач', 'дача', 'f', 'на даче', 'nature'],
+    ['набережн', 'набережная', 'f', 'на набережной', 'urban'], ['офис', 'офис', 'm', 'в офисе', 'urban'], ['кухн', 'кухня', 'f', 'на кухне', 'home'],
+    ['кафе', 'кафе', 'n', 'в кафе', 'urban'], ['кофейн', 'кофейня', 'f', 'в кофейне', 'urban'], ['вокзал', 'вокзал', 'm', 'на вокзале', 'transit'],
+    ['перрон', 'перрон', 'm', 'на перроне', 'transit'], ['аэропорт', 'аэропорт', 'm', 'в аэропорту', 'transit'], ['поезд', 'поезд', 'm', 'в поезде', 'transit'],
+    ['университет', 'университет', 'm', 'в университете', 'urban'], ['универ', 'университет', 'm', 'в университете', 'urban'],
+    ['школ', 'школа', 'f', 'в школе', 'urban'], ['крыш', 'крыша', 'f', 'на крыше', 'urban'], ['музе', 'музей', 'm', 'в музее', 'urban'],
+    ['двор', 'двор', 'm', 'во дворе', 'urban'], ['балкон', 'балкон', 'm', 'на балконе', 'home'], ['город', 'город', 'm', 'в городе', 'urban'],
+    ['улиц', 'улица', 'f', 'на улице', 'urban'], ['дом ', 'дом', 'm', 'дома', 'home'], ['дома ', 'дом', 'm', 'дома', 'home'], ['домой', 'дом', 'm', 'дома', 'home'], ['квартир', 'дом', 'm', 'дома', 'home'], ['комнат', 'комната', 'f', 'в комнате', 'home']
+  ];
+  const PEOPLE = [
+    ['мам', 'с мамой'], ['пап', 'с папой'], ['девушк', 'с девушкой'], ['парн', 'с парнем'], ['муж', 'с мужем'], ['жен', 'с женой'],
+    ['друз', 'с друзьями'], ['подруг', 'с подругой'], ['друг ', 'с другом'], ['другом', 'с другом'], ['друга ', 'с другом'], ['семь', 'с семьёй'], ['коллег', 'с коллегами'], ['команд', 'с командой'],
+    ['бабушк', 'с бабушкой'], ['дедушк', 'с дедушкой'], ['сестр', 'с сестрой'], ['брат', 'с братом'], ['дети', 'с детьми'], ['детьми', 'с детьми'], ['детей', 'с детьми'], ['сын', 'с сыном'], ['доч', 'с дочкой']
+  ];
+  const ALONE = ['один ', 'одна ', 'одной', 'одному', 'в одиночестве', 'одинок', 'никого', 'сам с собой', 'сама с собой'];
+  // деталь для названия: основа → фраза после «и»
+  const DETAILS = [
+    ['какао', 'какао'], ['кофе', 'кофе'], ['чай', 'чай'], ['торт', 'торт'], ['пицц', 'пицца'], ['пельмен', 'пельмени'], ['мороженое', 'мороженое'], ['морожен', 'мороженое'],
+    ['книг', 'книги'], ['гитар', 'гитара'], ['костёр', 'костёр'], ['костер', 'костёр'], ['фонар', 'фонари'], ['дожд', 'дождь'], ['ливн', 'ливень'], ['первый снег', 'первый снег'],
+    ['звёзд', 'звёзды'], ['звезд', 'звёзды'], ['закат', 'закат'], ['свеч', 'свечи'], ['плед', 'плед'], ['письм', 'письма'], ['шарик', 'шарики'], ['цветы', 'цветы'], ['цветов', 'цветы'],
+    ['песн', 'песни'], ['арбуз', 'арбуз'], ['волн', 'волны'], ['ракушк', 'ракушки'], ['листь', 'жёлтые листья'], ['туман', 'туман'], ['снег', 'снег'], ['чемодан', 'чемоданы']
+  ];
+  const EVENTS = [
+    ['сдач', 'перед сдачей'], ['дедлайн', 'перед дедлайном'], ['экзамен', 'перед экзаменом'], ['день рожд', 'в день рождения'], ['свадьб', 'на свадьбе'],
+    ['выпускн', 'на выпускном'], ['концерт', 'после концерта'], ['прощ', 'и прощание'], ['встреч', 'и долгожданная встреча'], ['переезд', 'перед переездом'], ['защит', 'перед защитой']
+  ];
+  const WEATHER = [['rain', ['дожд', 'ливн', 'морос', 'лужи', 'промок', 'зонт']], ['snow', ['снег', 'снеж', 'метел', 'вьюг']], ['sun', ['солн', 'ясно', 'жарк', 'зной']],
+    ['cold', ['холод', 'мороз', 'зябк', 'продрог']], ['wind', ['ветер', 'ветрен', 'ветр']], ['fog', ['туман', 'дымк']]];
+  const SENSES = [['запах', 'smell'], ['пахл', 'smell'], ['аромат', 'smell'], ['звук', 'sound'], ['шум', 'sound'], ['тишин', 'sound'], ['свет', 'light'], ['свеч', 'light'], ['вкус', 'taste'], ['обня', 'touch'], ['тепл', 'touch']];
+
+  function norm(s) { return ' ' + String(s || '').toLowerCase().replace(/ё/g, 'е').replace(/[«»"“”„.,!?;:()\-—–]/g, ' ').replace(/\s+/g, ' ') + ' '; }
+  function normE(s) { return String(s).toLowerCase().replace(/ё/g, 'е'); }
+  function hits(text, list) {
+    const found = [];
+    for (const st of list) {
+      const s = normE(st);
+      const needle = s.endsWith(' ') ? ' ' + s : ' ' + s;
+      if (text.includes(needle)) found.push(st.trim());
+    }
+    return found;
+  }
+  function firstGroup(text, groups) {
+    let best = null, bestPos = Infinity;
+    for (const [key, stems] of groups) for (const st of stems) {
+      const i = text.indexOf(' ' + normE(st));
+      if (i >= 0 && i < bestPos) { bestPos = i; best = key; }
+    }
+    return best;
+  }
+  function analyzeText(raw) {
+    const t = norm(raw);
+    const words = t.trim().split(' ').filter(Boolean);
+    const pos = hits(t, L.pos), neg = hits(t, L.neg), hi = hits(t, L.hi), lo = hits(t, L.lo), nost = hits(t, L.nost);
+    // отрицание «не» перед позитивом
+    const negated = (t.match(/ не (хорош|рад|весел|спокой|приятн)/g) || []).length;
+    const P = pos.length - negated, N = neg.length + negated;
+    const valence = clamp((P - N) / (P + N + 1.5), -1, 1);
+    const excl = (String(raw).match(/!/g) || []).length;
+    const sentences = String(raw).split(/[.!?…]+/).filter(s => s.trim().length > 2);
+    const avgLen = words.length / Math.max(1, sentences.length);
+    let arousal = 0.5 + (hi.length - lo.length) / (hi.length + lo.length + 2) * 0.75 + Math.min(excl, 4) * 0.04 - (avgLen > 16 ? 0.06 : 0);
+    arousal = clamp(arousal);
+    const season = firstGroup(t, SEASON);
+    const time = firstGroup(t, TIME);
+    let place = null, pi = Infinity;
+    for (const p of PLACES) { const i = t.indexOf(' ' + p[0]); if (i >= 0 && i < pi) { pi = i; place = { nom: p[1], g: p[2], prep: p[3], kind: p[4] }; } }
+    const people = []; for (const [st, ph] of PEOPLE) if (t.includes(' ' + st) && !people.includes(ph)) people.push(ph);
+    const alone = ALONE.some(a => t.includes(' ' + normE(a)));
+    let detail = null; for (const [st, ph] of DETAILS) { if (t.includes(' ' + normE(st))) { detail = ph; break; } } // приоритет — порядок списка: предметы важнее сезонных примет
+    let event = null; for (const [st, ph] of EVENTS) if (t.includes(' ' + st)) { event = ph; break; }
+    const weather = WEATHER.filter(([k, st]) => st.some(s => t.includes(' ' + normE(s)))).map(([k]) => k);
+    const senses = [...new Set(SENSES.filter(([s]) => t.includes(' ' + s)).map(([, k]) => k))];
+    // ключевая фраза для подписи — самое «чувственное» предложение (с наибольшим числом попаданий лексикона)
+    let caption = sentences[0] || String(raw).slice(0, 120), best = -1;
+    for (const s of sentences) {
+      const ns = norm(s);
+      const sc = hits(ns, L.pos).length + hits(ns, L.neg).length + hits(ns, L.lo).length * 0.5 + SENSES.filter(([x]) => ns.includes(' ' + x)).length + Math.min(s.trim().split(' ').length, 14) * 0.04;
+      if (sc > best && s.trim().split(' ').length <= 22) { best = sc; caption = s; }
+    }
+    caption = caption.trim().replace(/\s+/g, ' ');
+    if (caption.length > 110) caption = caption.slice(0, 107).replace(/\s\S*$/, '') + '…';
+    return { valence, arousal, season, time, place, people, alone, detail, event, weather, senses, nostalgia: nost.length,
+      found: { pos, neg, hi, lo, nost }, caption, words: words.length };
+  }
+
+  /* ---------------- ФОТО ---------------- */
+  function rgb2hsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0; const l = (mx + mn) / 2;
+    if (mx !== mn) { const d = mx - mn; s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+      h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+    return [h, s, l];
+  }
+  function analyzeImage(img) {
+    const S = 56, c = document.createElement('canvas'); c.width = S; c.height = S;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.drawImage(img, 0, 0, S, S);
+    const d = x.getImageData(0, 0, S, S).data, px = [];
+    let lum = 0, lum2 = 0, sat = 0, warm = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2]; px.push([r, g, b]);
+      const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; lum += l; lum2 += l * l;
+      sat += rgb2hsl(r, g, b)[1]; warm += (r - b) / 255;
+    }
+    const n = px.length; lum /= n; sat /= n; warm /= n;
+    const contrast = Math.sqrt(Math.max(0, lum2 / n - lum * lum));
+    // k-means k=5
+    const K = 5; let cent = [];
+    for (let k = 0; k < K; k++) cent.push(px[Math.floor((k + 0.5) / K * n)].slice());
+    let assign = new Array(n).fill(0);
+    for (let it = 0; it < 9; it++) {
+      for (let i = 0; i < n; i++) { let bi = 0, bd = 1e9; for (let k = 0; k < K; k++) { const a = px[i], c2 = cent[k]; const dd = (a[0] - c2[0]) ** 2 + (a[1] - c2[1]) ** 2 + (a[2] - c2[2]) ** 2; if (dd < bd) { bd = dd; bi = k; } } assign[i] = bi; }
+      const sum = Array.from({ length: K }, () => [0, 0, 0, 0]);
+      for (let i = 0; i < n; i++) { const s = sum[assign[i]]; s[0] += px[i][0]; s[1] += px[i][1]; s[2] += px[i][2]; s[3]++; }
+      cent = sum.map((s, k) => s[3] ? [s[0] / s[3], s[1] / s[3], s[2] / s[3]] : cent[k]);
+    }
+    const counts = new Array(K).fill(0); assign.forEach(a => counts[a]++);
+    const colors = cent.map((c2, k) => ({ rgb: c2.map(Math.round), share: counts[k] / n, hsl: rgb2hsl(...c2) })).sort((a, b) => b.share - a.share);
+    return { lum, sat, warm, contrast, colors };
+  }
+  function mergePhotos(list) {
+    if (!list.length) return { lum: 0.5, sat: 0.3, warm: 0, contrast: 0.2, colors: [], count: 0 };
+    const avg = k => list.reduce((s, p) => s + p[k], 0) / list.length;
+    const all = list.flatMap(p => p.colors.map(c => ({ ...c, share: c.share / list.length })));
+    // объединяем близкие цвета
+    const merged = [];
+    for (const c of all.sort((a, b) => b.share - a.share)) {
+      const m = merged.find(o => Math.hypot(o.rgb[0] - c.rgb[0], o.rgb[1] - c.rgb[1], o.rgb[2] - c.rgb[2]) < 38);
+      if (m) m.share += c.share; else merged.push({ ...c });
+    }
+    return { lum: avg('lum'), sat: avg('sat'), warm: avg('warm'), contrast: avg('contrast'), colors: merged.slice(0, 6), count: list.length };
+  }
+
+  /* ---------------- МУЗЫКА ---------------- */
+  const GENRES = [
+    [['джаз', 'jazz', 'свинг', 'swing', 'sinatra', 'синатр', 'блюз', 'blues', 'бибоп'], { label: 'джаз/свинг', warmth: 0.6, energy: 0.35, val: 0.25, era: 1955, acoustic: 1 }],
+    [['боссa', 'bossa', 'босса'], { label: 'босса-нова', warmth: 0.6, energy: 0.4, val: 0.35, era: 1965, acoustic: 1 }],
+    [['класс', 'classic', 'фортепиан', 'piano', 'пиано', 'оркестр', 'шопен', 'chopin', 'дебюсси', 'debussy', 'бах', 'вивальди'], { label: 'классика', warmth: 0.15, energy: 0.25, val: 0.05, era: 1880, acoustic: 1 }],
+    [['электрон', 'electro', 'techno', 'техно', 'house', 'хаус', 'edm', 'synth', 'синт', 'dnb', 'drum', 'trance', 'транс', 'idm'], { label: 'электроника', warmth: -0.6, energy: 0.8, val: 0, era: 2015, synthetic: 1 }],
+    [['ambient', 'эмбиент', 'амбиент', 'drone'], { label: 'эмбиент', warmth: -0.2, energy: 0.1, val: 0, era: 2010, synthetic: 1 }],
+    [['рок', 'rock', 'punk', 'панк', 'metal', 'метал', 'grunge', 'гранж'], { label: 'рок', warmth: 0, energy: 0.85, val: 0, era: 1995 }],
+    [['lofi', 'lo-fi', 'лоуфай', 'лофай'], { label: 'lo-fi', warmth: 0.35, energy: 0.25, val: 0.1, era: 2018, grain: 1 }],
+    [['hip', 'хип', 'рэп', 'rap', 'trap', 'трэп'], { label: 'хип-хоп', warmth: 0, energy: 0.7, val: 0.05, era: 2015 }],
+    [['фолк', 'folk', 'домбр', 'кюй', 'күй', 'этно', 'ethno', 'народн'], { label: 'фолк/этно', warmth: 0.5, energy: 0.45, val: 0.15, era: 1975, acoustic: 1 }],
+    [['соул', 'soul', 'r&b', 'rnb', 'фанк', 'funk', 'диско', 'disco'], { label: 'соул/фанк', warmth: 0.5, energy: 0.6, val: 0.35, era: 1978 }],
+    [['инди', 'indie', 'альтерн'], { label: 'инди', warmth: 0.1, energy: 0.5, val: 0.05, era: 2012 }],
+    [['шансон', 'романс', 'ретро', 'retro', 'эстрад', 'баллад', 'ballad'], { label: 'ретро-баллада', warmth: 0.35, energy: 0.3, val: -0.1, era: 1972, acoustic: 1 }],
+    [['поп', 'pop', 'k-pop', 'q-pop', 'кпоп'], { label: 'поп', warmth: 0.2, energy: 0.65, val: 0.35, era: 2018 }]
+  ];
+  function genreFromMeta(meta) {
+    const s = normE([meta.genre, meta.artist, meta.title].filter(Boolean).join(' '));
+    for (const [keys, g] of GENRES) if (keys.some(k => s.includes(k))) return { ...g };
+    return null;
+  }
+  function serviceFromUrl(u) {
+    if (!u) return null;
+    const s = u.toLowerCase();
+    if (s.includes('spotify')) return 'Spotify'; if (s.includes('youtu')) return 'YouTube'; if (s.includes('music.yandex')) return 'Яндекс Музыка';
+    if (s.includes('music.apple') || s.includes('itunes')) return 'Apple Music'; if (s.includes('soundcloud')) return 'SoundCloud'; if (s.includes('vk.com') || s.includes('vk.ru')) return 'VK Музыка';
+    return 'ссылка';
+  }
+
+  // радикс-2 FFT (на месте)
+  function fft(re, im) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = -2 * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) { let cr = 1, ci = 0;
+        for (let j = 0; j < len / 2; j++) { const a = i + j, b = a + len / 2; const tr = re[b] * cr - im[b] * ci, ti = re[b] * ci + im[b] * cr;
+          re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti; const ncr = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = ncr; } }
+    }
+  }
+  const KMAJ = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
+  const KMIN = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
+  const NOTES = ['до', 'до♯', 'ре', 'ре♯', 'ми', 'фа', 'фа♯', 'соль', 'соль♯', 'ля', 'ля♯', 'си'];
+  function corr(a, b) { const ma = a.reduce((s, x) => s + x, 0) / 12, mb = b.reduce((s, x) => s + x, 0) / 12; let n = 0, da = 0, db = 0;
+    for (let i = 0; i < 12; i++) { n += (a[i] - ma) * (b[i] - mb); da += (a[i] - ma) ** 2; db += (b[i] - mb) ** 2; } return n / Math.sqrt(da * db + 1e-9); }
+
+  async function analyzeAudio(arrayBuffer) {
+    const AC = G.OfflineAudioContext || G.webkitOfflineAudioContext;
+    const ctx = new AC(1, 44100, 44100);
+    const buf = await ctx.decodeAudioData(arrayBuffer.slice(0));
+    const sr0 = buf.sampleRate, ch0 = buf.getChannelData(0), ch1 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : null;
+    const dec = Math.max(1, Math.round(sr0 / 11025)), sr = sr0 / dec;
+    const dur = buf.duration, start = dur > 60 ? Math.floor(dur * 0.15 * sr0) : 0, len = Math.min(Math.floor(45 * sr0), ch0.length - start);
+    const N = Math.floor(len / dec), x = new Float32Array(N);
+    for (let i = 0; i < N; i++) { const k = start + i * dec; x[i] = ch1 ? (ch0[k] + ch1[k]) * 0.5 : ch0[k]; }
+    const F = 1024, H = 512, frames = Math.max(1, Math.floor((N - F) / H));
+    const win = new Float32Array(F); for (let i = 0; i < F; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / F);
+    const rms = new Float32Array(frames), flux = new Float32Array(frames), chroma = new Array(12).fill(0), bass = new Array(12).fill(0);
+    let prev = new Float32Array(F / 2), centSum = 0, centW = 0;
+    const re = new Float32Array(F), im = new Float32Array(F);
+    for (let f = 0; f < frames; f++) {
+      let e = 0;
+      for (let i = 0; i < F; i++) { const v = x[f * H + i] || 0; e += v * v; re[i] = v * win[i]; im[i] = 0; }
+      rms[f] = Math.sqrt(e / F);
+      fft(re, im);
+      let fl = 0;
+      for (let k = 1; k < F / 2; k++) {
+        const m = Math.sqrt(re[k] * re[k] + im[k] * im[k]);
+        const dd = m - prev[k]; if (dd > 0) fl += dd; prev[k] = m;
+        const hz = k * sr / F; centSum += hz * m; centW += m;
+        if (hz > 180 && hz < 2100) { const midi = 69 + 12 * Math.log2(hz / 440), pc = ((Math.round(midi) % 12) + 12) % 12; chroma[pc] += m * m; if (hz < 450) bass[pc] += m * m; }
+      }
+      flux[f] = fl;
+    }
+    // темп: автокорреляция огибающей атак
+    const fps = sr / H; const env = new Float32Array(frames);
+    let mean = 0; for (let i = 0; i < frames; i++) mean += flux[i]; mean /= frames;
+    for (let i = 0; i < frames; i++) env[i] = Math.max(0, flux[i] - mean);
+    const onsetDensityPre = () => { let c = 0; for (let i = 1; i < frames - 1; i++) if (env[i] > env[i - 1] && env[i] > env[i + 1] && env[i] > mean * 1.5) c++; return c / (frames / fps); };
+    let rmsM0 = 0; for (const v of rms) rmsM0 += v; rmsM0 /= frames;
+    const acf = bpm => { const lag = fps * 60 / bpm, l0 = Math.floor(lag), fr = lag - l0; let s = 0;
+      for (let i = 0; i + l0 + 1 < frames; i++) s += env[i] * (env[i + l0] * (1 - fr) + env[i + l0 + 1] * fr); return s; };
+    let bestBpm = 100, bestScore = -1;
+    for (let bpm = 60; bpm <= 180; bpm += 0.5) {
+      const w = Math.exp(-0.5 * (Math.log2(bpm / 105) / 0.9) ** 2), s = acf(bpm) * w;
+      if (s > bestScore) { bestScore = s; bestBpm = bpm; }
+    }
+    // октавная коррекция: если половинный темп почти так же убедителен — берём его (баллады, вальсы)
+        if (bestBpm >= 120 && acf(bestBpm / 2) > 0.95 * acf(bestBpm)) bestBpm /= 2;
+    let rmsMean = 0; for (const v of rms) rmsMean += v; rmsMean /= frames;
+    let onsetDensity = 0; for (let i = 1; i < frames - 1; i++) if (env[i] > env[i - 1] && env[i] > env[i + 1] && env[i] > mean * 1.5) onsetDensity++;
+    onsetDensity = onsetDensity / (frames / fps);
+    // тональность
+    let best = { r: -2 }; const mx = Math.max(...chroma) || 1, mb = Math.max(...bass) || 1; const cn = chroma.map((v, i) => v / mx + 0.8 * bass[i] / mb);
+    for (let k = 0; k < 12; k++) {
+      const rot = i => cn[(i + k) % 12];
+      const arr = Array.from({ length: 12 }, (_, i) => rot(i));
+      const rM = corr(arr, KMAJ), rm = corr(arr, KMIN);
+      if (rM > best.r) best = { r: rM, key: k, mode: 'major', other: rm };
+      if (rm > best.r) best = { r: rm, key: k, mode: 'minor', other: rM };
+    }
+    const centroid = centW ? centSum / centW : 1500;
+    // огибающая громкости для «музыкальной полосы» (64 точки по всему треку)
+    const envPts = 64, curve = [];
+    const step = Math.max(1, Math.floor(ch0.length / envPts));
+    for (let p = 0; p < envPts; p++) { let s = 0, c = 0; for (let i = p * step; i < Math.min(ch0.length, (p + 1) * step); i += 64) { s += ch0[i] * ch0[i]; c++; } curve.push(Math.sqrt(s / Math.max(1, c))); }
+    const cm = Math.max(...curve) || 1;
+    const freeTempo = onsetDensity < 1.2;
+    if (freeTempo) bestBpm = Math.round(58 + clamp(rmsMean / 0.18) * 30);
+    const energy = clamp(0.55 * clamp(rmsMean / 0.18) + 0.45 * clamp(onsetDensity / 6));
+    return {
+      source: 'audio', duration: dur, bpm: Math.round(bestBpm), freeTempo, energy, brightness: clamp((centroid - 700) / 2600),
+      mode: best.mode, key: NOTES[best.key] + (best.mode === 'major' ? ' мажор' : ' минор'), modeConfidence: clamp((best.r - best.other) * 4),
+      curve: curve.map(v => v / cm)
+    };
+  }
+  function describedMusic(meta) {
+    const tempo = { slow: 70, mid: 100, fast: 128 }[meta.tempo || 'mid'];
+    const mode = meta.mood === 'dark' ? 'minor' : meta.mood === 'light' ? 'major' : null;
+    const g = genreFromMeta(meta);
+    const energy = clamp((g ? g.energy : 0.5) * 0.6 + (tempo - 60) / 110 * 0.4);
+    const curve = Array.from({ length: 64 }, (_, i) => 0.45 + 0.4 * Math.abs(Math.sin(i * 0.37 + tempo * 0.01)) * (0.5 + energy * 0.5));
+    return { source: 'description', bpm: tempo, energy, brightness: g && g.synthetic ? 0.7 : 0.4, mode: mode || 'major', key: mode ? (mode === 'major' ? 'светлый лад' : 'минорный лад') : 'лад не указан', modeConfidence: mode ? 0.6 : 0.15, curve };
+  }
+  function finalizeMusic(a, meta) {
+    const g = genreFromMeta(meta || {});
+    const year = parseInt(meta && meta.year, 10);
+    const era = !isNaN(year) && year > 1850 && year < 2100 ? year : (g ? g.era : 2015);
+    return { ...a, genre: g ? g.label : (meta && meta.genre) || '—', genreTraits: g || {}, era, eraFromYear: !isNaN(year) && year > 1850 };
+  }
+
+  G.IZ = G.IZ || {};
+  Object.assign(G.IZ, { analyzeText, analyzeImage, mergePhotos, analyzeAudio, describedMusic, finalizeMusic, genreFromMeta, serviceFromUrl, rgb2hsl, clamp });
+})(window);
+
+</script>
+<script>
+/* ---- js/system.js ---- */
+/* system.js — визуальная система «Із»: правила, по которым настроение дня превращается в форму.
+ * Вход: анализ текста, фото, музыки. Выход: «паспорт дня» — координаты настроения, приём, палитра,
+ * ритм, фактура, типографика, голос, название папки + человекочитаемое объяснение каждого решения. */
+(function (G) {
+  'use strict';
+  const { clamp, rgb2hsl } = G.IZ;
+  const gauss = (x, m, s) => Math.exp(-0.5 * ((x - m) / s) ** 2);
+
+  // Художественные приёмы системы (переменный слой). Постоянный слой — сетка, шрифты, «компас дня», полоса музыки.
+  const TECH = {
+    monet: { name: 'Свет Моне', ref: 'Клод Моне, импрессионизм', what: 'фото переписывается короткими мазками, свет мягко дрожит, кадры растворяются друг в друге',
+      why: 'тёплое спокойное ощущение — это не предметы, а свет и воздух между ними; мазок убирает резкость и оставляет впечатление' },
+    kandinsky: { name: 'Геометрия Кандинского', ref: 'Василий Кандинский, «Композиция VIII», конструктивизм', what: 'фото режется жёсткой сеткой, поверх — круги, линии и углы, которые бьют в долю',
+      why: 'напряжение и скорость передаются конфликтом форм и острыми углами; ритм нарезки совпадает с темпом песни' },
+    matisse: { name: 'Вырезки Матисса', ref: 'Анри Матисс, поздние гуаши-вырезки', what: 'фото вставлено в «вырезанные» формы, вокруг — плоские яркие листья и водоросли, всё покачивается',
+      why: 'радость и общность — это открытый цвет и танцующий контур без теней; формы пружинят в такт' },
+    ma: { name: 'Ма — пустота', ref: 'японская минималистичная графика, «ма» (間), каллиграфический энсо', what: 'одно небольшое фото, много пустой бумаги, медленно рисуется круг энсо, красная печать',
+      why: 'тишина и одиночество передаются тем, чего нет: пустое пространство даёт дню «звучать» самому' },
+    film: { name: 'Плёнка', ref: 'аналоговая фотография, Kodak Gold / Ilford, фото-хроника 70-х', what: 'выцветшие цвета, зерно, засветки, перфорация и рыжий штамп даты',
+      why: 'ностальгия и светлая печаль — это ощущение «уже прошлого»; плёночная фактура сразу отодвигает день во времени' }
+  };
+
+  function hsl2rgb(h, s, l) {
+    h = ((h % 360) + 360) % 360 / 360;
+    if (s === 0) return [l, l, l].map(v => Math.round(v * 255));
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+    const f = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
+    return [f(h + 1 / 3), f(h), f(h - 1 / 3)].map(v => Math.round(v * 255));
+  }
+  const hex = c => '#' + c.map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('');
+
+  const SEASON_RU = { autumn: 'осень', winter: 'зима', spring: 'весна', summer: 'лето' };
+  const TIME_RU = { morning: 'утро', day: 'день', evening: 'вечер', night: 'ночь' };
+  const SEASON_ADJ = { autumn: ['Осенний', 'Осенняя', 'Осеннее', 'Осенние'], winter: ['Зимний', 'Зимняя', 'Зимнее', 'Зимние'],
+    spring: ['Весенний', 'Весенняя', 'Весеннее', 'Весенние'], summer: ['Летний', 'Летняя', 'Летнее', 'Летние'] };
+  const MOOD_ADJ = { calm: ['Тихий', 'Тихая', 'Тихое', 'Тихие'], joy: ['Звонкий', 'Звонкая', 'Звонкое', 'Звонкие'], tense: ['Длинный', 'Длинная', 'Длинное', 'Длинные'],
+    sad: ['Серый', 'Серая', 'Серое', 'Серые'], warm: ['Тёплый', 'Тёплая', 'Тёплое', 'Тёплые'] };
+  const GI = { m: 0, f: 1, n: 2, p: 3 };
+  const TIME_NOUN = { morning: ['Утро', 'n'], day: ['День', 'm'], evening: ['Вечер', 'm'], night: ['Ночь', 'f'] };
+
+  function moodWord(V, A) {
+    if (A > 0.62 && V < 0.15) return 'tense';
+    if (V < -0.2) return 'sad';
+    if (A > 0.58 && V >= 0.15) return 'joy';
+    if (V > 0.25 && A < 0.5) return 'warm';
+    return 'calm';
+  }
+
+  /* Название папки дня: 3–7 слов, именная фраза без глаголов, один тон для всего дневника. */
+  function makeTitle(tx, V, A) {
+    const mw = moodWord(V, A);
+    const lowerFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
+    let parts;
+    const pl = tx.place;
+    const tail = tx.event ? tx.event : tx.detail ? 'и ' + tx.detail : tx.people[0] ? tx.people[0] : null;
+    if (tx.event && /^(перед|после|в |на )/.test(tx.event) && tx.time && pl) {
+      // «Ночь в офисе перед сдачей»
+      parts = [TIME_NOUN[tx.time][0], pl.prep, tx.event];
+    } else if (pl && pl.kind !== 'home' && tail) {
+      // «Осенний парк и какао»
+      const adj = tx.season ? SEASON_ADJ[tx.season][GI[pl.g]] : MOOD_ADJ[mw][GI[pl.g]];
+      parts = [adj, lowerFirst(pl.nom), tail];
+      if (tx.people[0] && tail !== tx.people[0] && parts.join(' ').split(' ').length <= 4) parts.push(tx.people[0]);
+    } else if (pl && pl.kind === 'home') {
+      // «Зимний вечер дома и пельмени»
+      const tn = TIME_NOUN[tx.time || 'evening'];
+      const adj = tx.season ? SEASON_ADJ[tx.season][GI[tn[1]]] : MOOD_ADJ[mw][GI[tn[1]]];
+      parts = [adj, lowerFirst(tn[0]), pl.prep];
+      if (tail) parts.push(tail);
+    } else if (pl) {
+      const adj = tx.season ? SEASON_ADJ[tx.season][GI[pl.g]] : MOOD_ADJ[mw][GI[pl.g]];
+      const tn = tx.time ? { morning: 'утром', day: 'днём', evening: 'вечером', night: 'ночью' }[tx.time] : null;
+      parts = [adj, lowerFirst(pl.nom), tn || (tx.people[0] || 'и тишина')];
+    } else {
+      const tn = TIME_NOUN[tx.time || 'day'];
+      const adj = MOOD_ADJ[mw][GI[tn[1]]];
+      parts = [adj, lowerFirst(tn[0]), tail || (tx.season ? { autumn: 'в листопад', winter: 'в снегопад', spring: 'в оттепель', summer: 'в жару' }[tx.season] : 'наедине с собой')];
+    }
+    let title = parts.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+    let w = title.split(' ');
+    if (w.length > 7) title = w.slice(0, 7).join(' ');
+    if (w.length < 3) title += ' ' + ({ calm: 'и тишина', joy: 'и смех', tense: 'без сна', sad: 'и дождь', warm: 'и тепло' }[mw]);
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  }
+
+  function shiftColor(rgb, { hueTo, hueAmt, satMul, light }) {
+    let [h, s, l] = rgb2hsl(...rgb);
+    if (hueTo != null) { let d = ((hueTo - h + 540) % 360) - 180; h += d * hueAmt; }
+    s = clamp(s * satMul, 0, 1); l = clamp(l + light, 0.04, 0.96);
+    return hsl2rgb(h, s, l);
+  }
+
+  /* Главная функция: строит паспорт дня. */
+  function buildPassport(tx, ph, mu, meta = {}) {
+    const why = [];
+    // 1. Координаты настроения (валентность V ∈ [-1;1], энергия A ∈ [0;1])
+    const mVal = (mu.mode === 'major' ? 0.4 : -0.4) * (0.35 + 0.65 * mu.modeConfidence) + (mu.genreTraits.val || 0) * 0.6;
+    const mAr = clamp(clamp((mu.bpm - 60) / 110) * 0.5 + mu.energy * 0.5);
+    const pVal = ph.count ? (ph.lum - 0.5) * 0.6 + ph.sat * 0.3 + ph.warm * 0.4 : 0;
+    const pAr = ph.count ? clamp(ph.sat * 0.6 + ph.contrast * 1.2) : 0.4;
+    const V = clamp(0.55 * tx.valence + 0.27 * mVal + 0.18 * pVal, -1, 1);
+    const A = clamp(0.42 * tx.arousal + 0.43 * mAr + 0.15 * pAr);
+    why.push({ k: 'Настроение', v: `V=${V.toFixed(2)} (светлое ↔ тёмное), A=${A.toFixed(2)} (энергия). Текст даёт 55% валентности, песня 27%, фото 18%; энергия — на 43% из темпа и плотности песни.` });
+
+    // 2. Тепло/холод
+    const seasonW = { autumn: 0.5, summer: 0.4, spring: 0.1, winter: -0.45 }[tx.season] || 0;
+    const timeW = { evening: 0.3, morning: 0.1, day: 0, night: -0.4 }[tx.time] || 0;
+    const W = clamp(0.35 * (ph.count ? ph.warm * 2.2 : 0) + 0.25 * seasonW + 0.2 * timeW + 0.3 * (mu.genreTraits.warmth || 0) * 1.4 - (mu.genreTraits.synthetic ? 0.15 : 0), -1, 1);
+    // 3. Возраст звука и ностальгия
+    const eraF = clamp((2015 - mu.era) / 60);
+    const nost = clamp(tx.nostalgia * 0.25 + eraF * 0.6 + (tx.found.neg.some(w => /прощ|последн|уезжа|уехал/.test(w)) ? 0.25 : 0));
+    const social = tx.people.length > 0, alone = tx.alone || (!social && A < 0.4);
+    const nature = tx.place && tx.place.kind === 'nature', urban = tx.place && (tx.place.kind === 'urban' || tx.place.kind === 'transit');
+
+    // 4. Выбор приёма — каждый приём получает балл, побеждает лучший; второй даёт акцент
+    const sc = {
+      monet: gauss(V, 0.55, 0.45) * gauss(A, 0.3, 0.24) + (nature ? 0.18 : 0) + (W > 0.15 ? 0.12 : 0) + (tx.senses.includes('light') ? 0.06 : 0),
+      kandinsky: gauss(A, 0.88, 0.24) * (1 - 0.6 * Math.max(V, 0)) + (mu.genreTraits.synthetic ? 0.2 : 0) + (urban ? 0.08 : 0) + (tx.time === 'night' ? 0.08 : 0),
+      matisse: gauss(V, 0.75, 0.38) * gauss(A, 0.72, 0.22) + (social && tx.people.length > 0 && /друз|семь|команд|дет/.test(tx.people.join()) ? 0.15 : 0) + (tx.season === 'summer' ? 0.1 : 0),
+      ma: gauss(A, 0.12, 0.22) * gauss(V, 0.0, 0.5) + (alone ? 0.25 : 0) + (tx.season === 'winter' || tx.time === 'morning' ? 0.08 : 0) + (mu.genreTraits.label === 'эмбиент' ? 0.15 : 0),
+      film: gauss(V, -0.45, 0.45) * gauss(A, 0.35, 0.3) + nost * 0.45 + (tx.weather.includes('rain') ? 0.08 : 0)
+    };
+    const ranked = Object.entries(sc).sort((a, b) => b[1] - a[1]);
+    if (meta.forceTech && TECH[meta.forceTech]) { const i = ranked.findIndex(r => r[0] === meta.forceTech); ranked.unshift(ranked.splice(i, 1)[0]); }
+    const tech = ranked[0][0], accent = ranked[1][1] > ranked[0][1] * 0.45 && ranked[1][1] > 0.4 ? ranked[1][0] : null;
+    why.push({ k: 'Приём', v: `${TECH[tech].name} (${TECH[tech].ref}). ${TECH[tech].why}.` + (accent ? ` Акцент: ${TECH[accent].name.toLowerCase()} — второе по силе ощущение дня.` : '') });
+    const reasons = [];
+    if (nature && tech === 'monet') reasons.push('день прошёл на природе (' + tx.place.nom + ')');
+    if (mu.genreTraits.synthetic && tech === 'kandinsky') reasons.push('синтетический звук (' + mu.genre + ')');
+    if (alone && tech === 'ma') reasons.push('в записи нет других людей');
+    if (nost > 0.35 && tech === 'film') reasons.push(`ностальгия: ${tx.nostalgia ? 'слова о прошлом в тексте, ' : ''}${mu.era < 2000 ? (mu.eraFromYear ? 'песня ' + mu.era + ' года' : 'ретро-звучание (' + mu.genre + ')') : 'интонация песни'}`.replace(/, $/, ''));
+    if (social && tech === 'matisse') reasons.push('рядом были люди: ' + tx.people.join(', '));
+    if (reasons.length) why.push({ k: 'Почему именно он', v: reasons.join('; ') + '.' });
+
+    // 5. Палитра: цвета фото, сдвинутые настроением
+    const base = (ph.colors.length ? ph.colors : [{ rgb: [200, 180, 150] }, { rgb: [90, 80, 70] }, { rgb: [160, 140, 120] }]).map(c => c.rgb);
+    const hueTo = W >= 0 ? 32 : 212, hueAmt = Math.abs(W) * 0.32 + (tech === 'film' ? 0.15 : 0);
+    const satMul = { monet: 1.05, kandinsky: 1.25, matisse: 1.5, ma: 0.45, film: 0.7 }[tech] * (0.75 + 0.5 * A);
+    const light = V * 0.06 + (tech === 'ma' ? 0.05 : 0);
+    const palette = base.map(c => hex(shiftColor(c, { hueTo, hueAmt, satMul, light })));
+    // акцентный цвет: самый насыщенный, при радости — дополнительный
+    let accentCol = palette.slice().sort((a, b) => rgb2hsl(...hexRgb(b))[1] - rgb2hsl(...hexRgb(a))[1])[0];
+    // у Кандинского акцент — контрастный цвет к доминанте (его «звучащие» жёлтый/красный на синем)
+    const h0 = rgb2hsl(...hexRgb(palette[0]))[0];
+    const contra = [hex(hsl2rgb(h0 + 180, 0.8, 0.56)), hex(hsl2rgb(h0 + 145, 0.85, 0.6)), hex(hsl2rgb(h0 + 205, 0.7, 0.5))];
+    if (tech === 'kandinsky') accentCol = contra[0];
+    if (tech === 'ma') accentCol = '#b8322a';
+    if (tech === 'film') accentCol = '#e0782a';
+    // бумага (постоянный элемент, но слегка тонируется палитрой)
+    const paper = hex(shiftColor(hexRgb(palette[0]), { hueTo: W >= 0 ? 40 : 215, hueAmt: 0.6, satMul: 0.18, light: 0 }).map((v, i) => v * 0.12 + [244, 239, 230][i] * 0.88));
+    const ink = tech === 'kandinsky' && V < 0 ? '#14161c' : '#1d1b19';
+    why.push({ k: 'Палитра', v: `взята из ${ph.count} фото (${ph.colors.slice(0, 3).map(c => hex(c.rgb)).join(', ')}), сдвинута к ${W >= 0 ? 'тёплому охристому' : 'холодному сине-серому'} на ${Math.round(hueAmt * 100)}% (тепло дня W=${W.toFixed(2)}: сезон, время суток, фото и жанр песни), насыщенность ×${satMul.toFixed(2)}.` });
+
+    // 6. Ритм и движение — из песни
+    const beat = 60 / mu.bpm;
+    const beatsPerScene = A > 0.65 ? 8 : A > 0.4 ? 12 : 16;
+    const sceneDur = clamp(beat * beatsPerScene, 3, 11);
+    const fade = tech === 'kandinsky' ? 0.08 : clamp((1 - A) * 2.2, 0.3, 2.4);
+    const air = clamp(1 - A * 0.75 + (tech === 'ma' ? 0.3 : 0), 0.1, 1);
+    const duration = clamp(Math.max(ph.count, 1) * sceneDur, 15, 45);
+    why.push({ k: 'Ритм', v: `${mu.bpm} BPM (${mu.source === 'audio' ? 'аудиоанализ файла' : 'по описанию песни'}) → смена кадра каждые ${beatsPerScene} долей (${sceneDur.toFixed(1)} c), переход ${fade < 0.2 ? 'резкий, в долю' : fade.toFixed(1) + ' c растворения'}. ${A < 0.45 ? 'Медленная песня даёт больше воздуха: поля ' + Math.round(air * 100) + '%.' : 'Энергичная песня сжимает поля до ' + Math.round(air * 100) + '%.'}` });
+
+    // 7. Фактура
+    const grain = clamp(0.04 + eraF * 0.35 + (tech === 'film' ? 0.3 : 0) + (mu.genreTraits.grain ? 0.15 : 0), 0, 0.7);
+    why.push({ k: 'Фактура', v: `зерно ${Math.round(grain * 100)}%: ${mu.era < 1995 ? (mu.eraFromYear ? 'песня ' + mu.era + ' года' : 'звучание жанра «' + mu.genre + '» (условно ' + Math.floor(mu.era / 10) * 10 + '-е)') + ' «состаривает» кадр' : 'современный звук — почти чистый кадр'}${tech === 'film' ? ', плюс плёночный приём' : ''}. Лад: ${mu.key}${mu.mode === 'minor' ? ' — приглушённые тени' : ' — открытый свет'}.` });
+
+    // 8. Типографика (постоянные шрифты, переменное начертание)
+    const type = {
+      title: A > 0.66 ? 'grotesk' : 'serif',
+      caption: V > 0.15 && A < 0.75 ? 'hand' : A > 0.66 ? 'mono' : 'serifItalic'
+    };
+    why.push({ k: 'Типографика', v: `название — ${type.title === 'serif' ? 'антиква (спокойный день)' : 'гротеск, плотный (энергичный день)'}; подпись — ${{ hand: 'рукописная (тёплый, личный день)', mono: 'моноширинная (сжатый, рабочий ритм)', serifItalic: 'курсив (задумчивый день)' }[type.caption]}.` });
+
+    // 9. Голос озвучки
+    let voice;
+    if (tech === 'kandinsky' || (A > 0.65 && V < 0.2)) voice = { id: 'glassy', label: 'чёткий, собранный', rate: 1.08 };
+    else if (A > 0.6) voice = { id: 'buttery', label: 'живой, быстрый', rate: 1.15 };
+    else if (V < -0.15 || tech === 'film') voice = { id: 'rounded', label: 'мягкий, негромкий', rate: 0.86 };
+    else if (tech === 'ma') voice = { id: 'airy', label: 'воздушный, медленный', rate: 0.8 };
+    else voice = { id: 'rounded', label: 'тихий и тёплый', rate: 0.88 };
+    voice.pitch = clamp(0.92 + V * 0.12 + (A - 0.5) * 0.1, 0.7, 1.2);
+    why.push({ k: 'Голос', v: `${voice.label}: темп речи ×${voice.rate} (энергия дня ${A.toFixed(2)}), высота ×${voice.pitch.toFixed(2)} (валентность).` });
+
+    const title = (meta.title && meta.title.trim()) || makeTitle(tx, V, A);
+    why.push({ k: 'Название папки', v: `«${title}» — собрано из записи: ${[tx.season && 'сезон «' + SEASON_RU[tx.season] + '»', tx.time && 'время «' + TIME_RU[tx.time] + '»', tx.place && 'место «' + tx.place.nom + '»', tx.detail && 'деталь «' + tx.detail + '»', tx.event && 'событие «' + tx.event + '»', tx.people[0] && 'люди «' + tx.people.join(', ') + '»'].filter(Boolean).join(', ') || 'настроение дня'}.` });
+
+    return { V, A, W, nost, tech, accent, scores: sc, palette, contra, accentCol, paper, ink, beat, sceneDur, fade, air, duration, grain, type, voice, title, why, mood: moodWord(V, A) };
+  }
+  function hexRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+
+  Object.assign(G.IZ, { TECH, buildPassport, makeTitle, hexRgb, hex, hsl2rgb, SEASON_RU, TIME_RU });
+})(window);
+
+</script>
+<script>
+/* ---- js/render.js ---- */
+/* render.js — рендер «страницы дневника»: вертикальный кадр 9:16 (720×1280).
+ * Постоянный слой: бумага, сетка, шапка с номером и датой, название, подпись, полоса музыки, «компас дня».
+ * Переменный слой: один из пяти художественных приёмов + акцент второго. */
+(function (G) {
+  'use strict';
+  const { clamp, hexRgb, TECH } = G.IZ;
+  const W = 720, H = 1280, M = 44;
+  const ZONE = { x: M, y: 104, w: W - 2 * M, h: 780 };
+  const FONTS = { serif: '"Cormorant Garamond", "Lora", Georgia, serif', hand: '"Caveat", "Segoe Print", cursive', mono: '"JetBrains Mono", "DejaVu Sans Mono", monospace', grotesk: '"Unbounded", "Manrope", "Arial Black", sans-serif' };
+  const WD = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+
+  function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const rgba = (hx, a) => { const [r, g, b] = hexRgb(hx); return `rgba(${r},${g},${b},${a})`; };
+
+  function cover(img, w, h, fx = 0.5, fy = 0.5) {
+    const c = mk(w, h), x = c.getContext('2d');
+    const s = Math.max(w / img.width, h / img.height), dw = img.width * s, dh = img.height * s;
+    x.drawImage(img, (w - dw) * fx, (h - dh) * fy, dw, dh); return c;
+  }
+  function nearest(pal, r, g, b) { let bi = 0, bd = 1e9; for (let i = 0; i < pal.length; i++) { const p = pal[i]; const d = (p[0] - r) ** 2 + (p[1] - g) ** 2 + (p[2] - b) ** 2; if (d < bd) { bd = d; bi = i; } } return pal[bi]; }
+
+  const grainCache = [];
+  function grainTiles() {
+    if (grainCache.length) return grainCache;
+    for (let k = 0; k < 4; k++) { const c = mk(256, 256), x = c.getContext('2d'), d = x.createImageData(256, 256);
+      for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+      x.putImageData(d, 0, 0); grainCache.push(c); }
+    return grainCache;
+  }
+  const paperCache = {};
+  function paperTex(col) {
+    if (paperCache[col]) return paperCache[col];
+    const c = mk(W, H), x = c.getContext('2d'); x.fillStyle = col; x.fillRect(0, 0, W, H);
+    const r = rng(7);
+    for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(80,60,40,${r() * 0.035})`; const s = 1 + r() * 2.5; x.fillRect(r() * W, r() * H, s, s); }
+    for (let i = 0; i < 60; i++) { x.strokeStyle = `rgba(120,100,80,${0.025 + r() * 0.03})`; x.lineWidth = 0.6; x.beginPath(); const y = r() * H, xx = r() * W; x.moveTo(xx, y); x.lineTo(xx + 30 + r() * 90, y + (r() - 0.5) * 8); x.stroke(); }
+    paperCache[col] = c; return c;
+  }
+
+  /* --------- подготовка кадров под приём --------- */
+  function prepare(day, imgs) {
+    const P = day.passport, seed = hashStr(day.id), pal = P.palette.map(hexRgb);
+    const zw = ZONE.w, zh = ZONE.h;
+    return imgs.map((img, idx) => {
+      const r = rng(seed + idx * 101);
+      const out = { idx };
+      const tech = P.tech;
+      if (tech === 'monet') {
+        const base = cover(img, zw, zh), bx = base.getContext('2d', { willReadFrequently: true });
+        const data = bx.getImageData(0, 0, zw, zh).data;
+        const c = mk(zw, zh), x = c.getContext('2d');
+        x.filter = 'blur(10px) saturate(1.2)'; x.drawImage(base, 0, 0); x.filter = 'none';
+        x.fillStyle = rgba(P.palette[0], 0.12); x.fillRect(0, 0, zw, zh);
+        const lumAt = (px, py) => { px = clamp(px | 0, 0, zw - 1); py = clamp(py | 0, 0, zh - 1); const i = (py * zw + px) * 4; return data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11; };
+        x.lineCap = 'round';
+        const passes = [[1400, 11, 26], [4200, 6, 15], [3000, 3.5, 9]];
+        for (const [n, wid, len] of passes) for (let i = 0; i < n; i++) {
+          const px = r() * zw, py = r() * zh, ii = ((py | 0) * zw + (px | 0)) * 4;
+          let cr = data[ii], cg = data[ii + 1], cb = data[ii + 2];
+          const np = nearest(pal, cr, cg, cb); const k = 0.38; cr = cr * (1 - k) + np[0] * k; cg = cg * (1 - k) + np[1] * k; cb = cb * (1 - k) + np[2] * k;
+          const j = (r() - 0.5) * 26; cr += j; cg += j * 0.8; cb += j * 0.5;
+          const gx = lumAt(px + 3, py) - lumAt(px - 3, py), gy = lumAt(px, py + 3) - lumAt(px, py - 3);
+          const ang = Math.atan2(gy, gx) + Math.PI / 2 + (r() - 0.5) * 0.6, l = len * (0.6 + r() * 0.7);
+          x.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${0.55 + r() * 0.4})`; x.lineWidth = wid * (0.7 + r() * 0.6);
+          x.beginPath(); x.moveTo(px - Math.cos(ang) * l / 2, py - Math.sin(ang) * l / 2);
+          x.quadraticCurveTo(px + (r() - 0.5) * 4, py + (r() - 0.5) * 4, px + Math.cos(ang) * l / 2, py + Math.sin(ang) * l / 2); x.stroke();
+        }
+        out.painted = c;
+        out.light = { x: 0.2 + r() * 0.6, y: 0.15 + r() * 0.4 };
+      } else if (tech === 'kandinsky') {
+        const base = cover(img, zw, zh), bx = base.getContext('2d', { willReadFrequently: true });
+        const d = bx.getImageData(0, 0, zw, zh), pp = pal.concat([[20, 22, 28], [232, 230, 224], [200, 204, 214]]);
+        for (let i = 0; i < d.data.length; i += 4) { const l = d.data[i] * 0.3 + d.data[i + 1] * 0.59 + d.data[i + 2] * 0.11;
+          const q = nearest(pp, d.data[i] * 0.6 + l * 0.4, d.data[i + 1] * 0.6 + l * 0.4, d.data[i + 2] * 0.6 + l * 0.4); d.data[i] = q[0]; d.data[i + 1] = q[1]; d.data[i + 2] = q[2]; }
+        bx.putImageData(d, 0, 0); out.poster = base;
+        const shapes = [];
+        const n = 8 + (r() * 4 | 0);
+        for (let i = 0; i < n; i++) {
+          const t = r();
+          shapes.push({ type: t < 0.35 ? 'circle' : t < 0.65 ? 'line' : t < 0.82 ? 'tri' : t < 0.92 ? 'arc' : 'checker',
+            x: r(), y: r(), s: 0.05 + r() * 0.16, a: r() * Math.PI, c: i % 2 ? P.contra[(r() * 3) | 0] : P.palette[(r() * P.palette.length) | 0], beat: (r() * 4) | 0 });
+        }
+        shapes.push({ type: 'circle', x: 0.25 + r() * 0.5, y: 0.2 + r() * 0.3, s: 0.2, a: 0, c: P.accentCol, beat: 0, big: true });
+        out.shapes = shapes; out.cells = Array.from({ length: 12 }, () => ({ dx: 0, dy: 0, seed: r() }));
+      } else if (tech === 'matisse') {
+        out.photo = cover(img, zw, zh);
+        const pts = [], cx = zw * (0.42 + r() * 0.16), cy = zh * (0.42 + r() * 0.12), R = Math.min(zw, zh) * 0.4;
+        for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; pts.push([cx + Math.cos(a) * R * (0.78 + r() * 0.35), cy + Math.sin(a) * R * (0.85 + r() * 0.4)]); }
+        out.blob = pts;
+        const leaves = [];
+        for (let i = 0; i < 9; i++) leaves.push({ x: r(), y: r(), s: 0.1 + r() * 0.16, a: r() * Math.PI * 2, c: P.palette[(r() * P.palette.length) | 0], kind: r() < 0.5 ? 'frond' : 'star', ph: r() * 6 });
+        out.leaves = leaves;
+        out.blocks = [{ x: r() * 0.3, y: r() * 0.2, w: 0.5 + r() * 0.3, h: 0.35 + r() * 0.2, c: P.palette[1 % P.palette.length] }, { x: 0.4 + r() * 0.3, y: 0.5 + r() * 0.2, w: 0.4, h: 0.4, c: P.palette[2 % P.palette.length] }];
+      } else if (tech === 'ma') {
+        const pw = Math.round(zw * 0.54), phh = Math.round(pw * 1.22);
+        const c = cover(img, pw, phh), x = c.getContext('2d');
+        const d = x.getImageData(0, 0, pw, phh);
+        for (let i = 0; i < d.data.length; i += 4) { const l = d.data[i] * 0.3 + d.data[i + 1] * 0.59 + d.data[i + 2] * 0.11; for (let k = 0; k < 3; k++) d.data[i + k] = (d.data[i + k] * 0.45 + l * 0.55) * 0.85 + 255 * 0.15 * 0.8; }
+        x.putImageData(d, 0, 0); out.small = c;
+        const left = (seed + idx) % 2 === 0;
+        out.pos = { x: left ? zw * 0.06 : zw - pw - zw * 0.06, y: zh * (0.06 + r() * 0.1) };
+        out.enso = { x: left ? zw * 0.72 : zw * 0.28, y: zh * 0.74, R: zw * 0.17, start: r() * Math.PI * 2, gap: 0.35 + r() * 0.3 };
+      } else { // film
+        const c = cover(img, zw - 60, zh - 40), x = c.getContext('2d'), d = x.getImageData(0, 0, c.width, c.height);
+        const tint = hexRgb(P.palette[0]);
+        for (let i = 0; i < d.data.length; i += 4) {
+          for (let k = 0; k < 3; k++) { let v = d.data[i + k] / 255; v = 0.1 + v * 0.78; v = v * 0.82 + (tint[k] / 255) * 0.18; d.data[i + k] = v * 255; }
+          d.data[i] = Math.min(255, d.data[i] * 1.06); d.data[i + 2] *= 0.9;
+        }
+        x.putImageData(d, 0, 0);
+        const g = x.createRadialGradient(c.width / 2, c.height / 2, c.height * 0.25, c.width / 2, c.height / 2, c.height * 0.75);
+        g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(20,10,0,0.55)'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+        out.toned = c; out.leak = { y: r(), sp: 0.5 + r() };
+      }
+      // для акцентов
+      out.r = rng(seed + idx * 7 + 3);
+      out.accentShapes = Array.from({ length: 3 }, () => ({ x: out.r(), y: out.r(), s: 0.05 + out.r() * 0.08, a: out.r() * 3, c: P.palette[(out.r() * P.palette.length) | 0] }));
+      return out;
+    });
+  }
+
+  /* --------- приёмы --------- */
+  function drawMonet(x, f, t, p, P, bEnv) {
+    const zw = ZONE.w, zh = ZONE.h, s = 1.02 + p * 0.06;
+    x.save(); x.translate(zw / 2, zh / 2); x.scale(s, s); x.translate(-zw / 2 + (p - 0.5) * 14, -zh / 2);
+    x.drawImage(f.painted, 0, 0); x.restore();
+    // дрожащий свет
+    const lx = (f.light.x + Math.sin(t * 0.4) * 0.05) * zw, ly = (f.light.y + Math.cos(t * 0.3) * 0.04) * zh;
+    const g = x.createRadialGradient(lx, ly, 10, lx, ly, zw * 0.7);
+    g.addColorStop(0, `rgba(255,236,200,${0.32 + 0.05 * Math.sin(t * 1.7)})`); g.addColorStop(1, 'rgba(255,236,200,0)');
+    x.globalCompositeOperation = 'soft-light'; x.fillStyle = g; x.fillRect(0, 0, zw, zh); x.globalCompositeOperation = 'source-over';
+  }
+  function drawKandinsky(x, f, t, p, P, bEnv, beatIdx) {
+    const zw = ZONE.w, zh = ZONE.h, cols = 3, rows = 4, cw = zw / cols, ch = zh / rows;
+    x.fillStyle = '#ecebe6'; x.fillRect(0, 0, zw, zh);
+    for (let i = 0; i < cols * rows; i++) {
+      const cx = i % cols, cy = (i / cols) | 0, cell = f.cells[i];
+      const hit = ((beatIdx * 7 + i * 3) % 5) === 0;
+      const dx = hit ? (cell.seed - 0.5) * 26 * bEnv : 0, dy = hit ? (0.5 - cell.seed) * 18 * bEnv : 0;
+      x.save(); x.beginPath(); x.rect(cx * cw + 3, cy * ch + 3, cw - 6, ch - 6); x.clip();
+      x.drawImage(f.poster, cx * cw, cy * ch, cw, ch, cx * cw + dx, cy * ch + dy, cw, ch); x.restore();
+    }
+    x.strokeStyle = P.ink; x.lineWidth = 3; for (let i = 1; i < cols; i++) { x.beginPath(); x.moveTo(i * cw, 0); x.lineTo(i * cw, zh); x.stroke(); }
+    for (let j = 1; j < rows; j++) { x.beginPath(); x.moveTo(0, j * ch); x.lineTo(zw, j * ch); x.stroke(); }
+    for (const sh of f.shapes) {
+      const pulse = 1 + (sh.beat === beatIdx % 4 ? 0.12 * bEnv : 0), S = sh.s * zw * pulse, X = sh.x * zw, Y = sh.y * zh;
+      x.save(); x.translate(X, Y); x.rotate(sh.a + t * 0.05 * (sh.beat - 1.5));
+      if (sh.type === 'circle') {
+        x.globalAlpha *= sh.big ? 0.88 : 1;
+        x.fillStyle = sh.c; x.beginPath(); x.arc(0, 0, S * (sh.big ? 1.6 : 1), 0, 7); x.fill();
+        x.strokeStyle = P.ink; x.lineWidth = sh.big ? 4 : 2; x.beginPath(); x.arc(0, 0, S * (sh.big ? 1.6 : 1) + 6, 0, 7); x.stroke();
+        if (sh.big) { x.fillStyle = P.contra[1]; x.beginPath(); x.arc(0, 0, S * 0.55, 0, 7); x.fill(); x.fillStyle = P.ink; x.beginPath(); x.arc(0, 0, S * 0.22, 0, 7); x.fill(); }
+      } else if (sh.type === 'line') { x.strokeStyle = P.ink; x.lineWidth = 3 + sh.s * 30; x.beginPath(); x.moveTo(-S * 2.2, 0); x.lineTo(S * 2.2, 0); x.stroke(); }
+      else if (sh.type === 'tri') { x.fillStyle = sh.c; x.strokeStyle = P.ink; x.lineWidth = 2; x.beginPath(); x.moveTo(0, -S); x.lineTo(S * 0.9, S * 0.7); x.lineTo(-S * 0.9, S * 0.7); x.closePath(); x.fill(); x.stroke(); }
+      else if (sh.type === 'arc') { x.strokeStyle = sh.c; x.lineWidth = 8; x.beginPath(); x.arc(0, 0, S * 1.3, 0, Math.PI * 1.1); x.stroke(); }
+      else { const q = S / 3; for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) { x.fillStyle = (a + b) % 2 ? P.ink : '#ecebe6'; x.fillRect(a * q - S / 2, b * q - S / 2, q, q); } }
+      x.restore();
+    }
+  }
+  function blobPath(x, pts, wob) {
+    const n = pts.length; x.beginPath();
+    const P = pts.map(([a, b], i) => [a + Math.sin(wob + i) * 5, b + Math.cos(wob * 0.8 + i) * 5]);
+    x.moveTo((P[0][0] + P[n - 1][0]) / 2, (P[0][1] + P[n - 1][1]) / 2);
+    for (let i = 0; i < n; i++) { const a = P[i], b = P[(i + 1) % n]; x.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); }
+    x.closePath();
+  }
+  function frond(x, S, kind) {
+    x.beginPath();
+    if (kind === 'star') { for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, rr = i % 2 ? S * 0.45 : S; x.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } x.closePath(); return; }
+    x.moveTo(0, S);
+    for (let i = 0; i <= 6; i++) { const y = S - i * S / 3; x.quadraticCurveTo(-S * 0.75, y - S / 6, -S * 0.08, y - S / 3); }
+    for (let i = 6; i >= 0; i--) { const y = S - i * S / 3; x.quadraticCurveTo(S * 0.75, y - S / 6, S * 0.08, y); }
+    x.closePath();
+  }
+  function drawMatisse(x, f, t, p, P, bEnv) {
+    const zw = ZONE.w, zh = ZONE.h;
+    for (const b of f.blocks) { x.fillStyle = b.c; x.fillRect(b.x * zw, b.y * zh, b.w * zw, b.h * zh); }
+    x.save(); blobPath(x, f.blob, t * 0.8); x.clip();
+    const s = 1.04 + bEnv * 0.02; x.translate(zw / 2, zh / 2); x.scale(s, s); x.translate(-zw / 2, -zh / 2);
+    x.filter = 'saturate(1.35) contrast(1.05)'; x.drawImage(f.photo, 0, 0); x.filter = 'none'; x.restore();
+    for (const l of f.leaves) {
+      x.save(); x.translate(l.x * zw, l.y * zh); x.rotate(l.a + Math.sin(t * 1.3 + l.ph) * 0.12); const sc = 1 + bEnv * 0.07; x.scale(sc, sc);
+      x.fillStyle = l.c; frond(x, l.s * zw, l.kind); x.fill(); x.restore();
+    }
+  }
+  function enso(x, e, prog, ink) {
+    const steps = 90, end = Math.floor(steps * clamp(prog));
+    for (let i = 0; i < end; i++) {
+      const a0 = e.start + (i / steps) * (Math.PI * 2 - e.gap), a1 = e.start + ((i + 1) / steps) * (Math.PI * 2 - e.gap);
+      const w = 4 + 14 * Math.sin(Math.PI * (i / steps)) ** 0.7;
+      x.strokeStyle = rgba(ink, 0.82 - i / steps * 0.25); x.lineWidth = w; x.lineCap = 'round';
+      const rr = e.R * (1 + Math.sin(i * 0.3) * 0.015);
+      x.beginPath(); x.arc(e.x, e.y, rr, a0, a1); x.stroke();
+    }
+  }
+  function drawMa(x, f, t, p, P) {
+    const a = clamp(p * 3);
+    x.globalAlpha = a; x.drawImage(f.small, f.pos.x, f.pos.y + (1 - a) * 8); x.globalAlpha = 1;
+    x.strokeStyle = rgba(P.ink, 0.35); x.lineWidth = 1; x.strokeRect(f.pos.x - 8, f.pos.y - 8, f.small.width + 16, f.small.height + 16);
+    enso(x, f.enso, p * 1.6, '#24211f');
+  }
+  function drawFilm(x, f, t, p, P, bEnv) {
+    const zw = ZONE.w, zh = ZONE.h;
+    x.fillStyle = '#17120e'; x.fillRect(0, 0, zw, zh);
+    for (let y = 18; y < zh - 10; y += 34) { x.fillStyle = '#e9dcc4'; roundRect(x, 8, y, 14, 20, 3); x.fill(); roundRect(x, zw - 22, y, 14, 20, 3); x.fill(); }
+    const weave = Math.sin(t * 17) * 1.2, flick = 0.96 + Math.sin(t * 23) * 0.025 + Math.sin(t * 7.1) * 0.015;
+    x.save(); x.filter = `brightness(${flick})`; roundRect(x, 30, 20 + weave, f.toned.width, f.toned.height, 10); x.clip();
+    x.drawImage(f.toned, 30, 20 + weave); x.filter = 'none';
+    const ly = (f.leak.y + Math.sin(t * 0.3 * f.leak.sp) * 0.3) * zh;
+    const g = x.createRadialGradient(zw * 0.9, ly, 10, zw * 0.9, ly, zw * 0.6);
+    g.addColorStop(0, 'rgba(255,120,40,0.45)'); g.addColorStop(0.5, 'rgba(255,80,30,0.12)'); g.addColorStop(1, 'rgba(255,80,30,0)');
+    x.globalCompositeOperation = 'screen'; x.fillStyle = g; x.fillRect(0, 0, zw, zh); x.globalCompositeOperation = 'source-over';
+    x.restore();
+  }
+  function roundRect(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+
+  function drawAccent(x, f, t, P, bEnv) {
+    const zw = ZONE.w, zh = ZONE.h, a = P.accent; if (!a || a === P.tech) return;
+    if (a === 'kandinsky') { x.strokeStyle = P.ink; x.lineWidth = 3; for (const s of f.accentShapes.slice(0, 2)) { x.beginPath(); x.moveTo(s.x * zw, s.y * zh); x.lineTo(s.x * zw + 140 * Math.cos(s.a), s.y * zh + 140 * Math.sin(s.a)); x.stroke(); }
+      const s = f.accentShapes[2]; x.strokeStyle = s.c; x.lineWidth = 5; x.beginPath(); x.arc(s.x * zw, s.y * zh, 30 + bEnv * 6, 0, 7); x.stroke(); }
+    else if (a === 'matisse') { for (const s of f.accentShapes.slice(0, 2)) { x.save(); x.translate(s.x * zw, s.y * zh); x.rotate(s.a + Math.sin(t) * 0.1); x.fillStyle = s.c; x.globalAlpha = 0.9; frond(x, s.s * zw, 'frond'); x.fill(); x.restore(); } x.globalAlpha = 1; }
+    else if (a === 'ma') { /* печать уже есть в каркасе: усиливаем пустоту — светлая вуаль снизу */ const g = x.createLinearGradient(0, zh * 0.6, 0, zh); g.addColorStop(0, rgba(P.paper, 0)); g.addColorStop(1, rgba(P.paper, 0.55)); x.fillStyle = g; x.fillRect(0, 0, zw, zh); }
+    else if (a === 'film') { x.fillStyle = 'rgba(224,120,42,0.9)'; x.font = `600 20px ${FONTS.mono}`; x.textAlign = 'right'; x.fillText(filmStamp(P._date), zw - 24, zh - 22); x.textAlign = 'left'; }
+    else if (a === 'monet') { const g = x.createRadialGradient(zw * 0.3, zh * 0.25, 5, zw * 0.3, zh * 0.25, zw * 0.6); g.addColorStop(0, 'rgba(255,240,210,0.28)'); g.addColorStop(1, 'rgba(255,240,210,0)'); x.globalCompositeOperation = 'soft-light'; x.fillStyle = g; x.fillRect(0, 0, zw, zh); x.globalCompositeOperation = 'source-over'; }
+  }
+  function filmStamp(d) { const dt = new Date(d); return `’${String(dt.getFullYear()).slice(2)} ${String(dt.getMonth() + 1).padStart(2, '0')} ${String(dt.getDate()).padStart(2, '0')}`; }
+
+  function wrap(x, text, maxW, maxLines) {
+    const words = text.split(' '), lines = []; let cur = '';
+    for (const w of words) { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+    if (cur) lines.push(cur);
+    if (lines.length > maxLines) { const l = lines.slice(0, maxLines); l[maxLines - 1] = l[maxLines - 1].replace(/\s*\S*$/, '') + '…'; return l; }
+    return lines;
+  }
+
+  /* --------- кадр целиком --------- */
+  function drawFrame(ctx, day, frames, t, opts = {}) {
+    const P = day.passport; P._date = day.date;
+    const x = ctx; x.save();
+    x.drawImage(paperTex(P.paper), 0, 0);
+    const n = Math.max(1, frames.length), sd = P.sceneDur;
+    const sIdx = Math.floor(t / sd), local = t - sIdx * sd, p = local / sd;
+    const beatT = t / P.beat, beatIdx = Math.floor(beatT), bEnv = Math.exp(-(beatT - beatIdx) * 5);
+    const cur = frames[sIdx % n], prev = frames[(sIdx - 1 + n) % n];
+    // зона фото (постоянное место, переменная «воздушность»)
+    const inset = P.tech === 'ma' || P.tech === 'film' ? 0 : Math.round(P.air * 26);
+    x.save(); x.translate(ZONE.x + inset, ZONE.y + inset); x.scale((ZONE.w - 2 * inset) / ZONE.w, (ZONE.h - 2 * inset) / ZONE.h);
+    x.beginPath(); x.rect(0, 0, ZONE.w, ZONE.h); x.clip();
+    if (P.tech !== 'ma' && P.tech !== 'matisse') { x.fillStyle = P.paper; x.fillRect(0, 0, ZONE.w, ZONE.h); }
+    const draw = (f, tt, pp, alpha) => {
+      if (!f) return; x.save(); x.globalAlpha = alpha;
+      ({ monet: drawMonet, kandinsky: drawKandinsky, matisse: drawMatisse, ma: drawMa, film: drawFilm })[P.tech](x, f, tt, pp, P, bEnv, beatIdx);
+      x.restore();
+    };
+    if (sIdx > 0 && local < P.fade && n > 1) {
+      // переход: старый кадр под новым (для «ма» — сначала исчезает, потом появляется)
+      if (P.tech === 'ma') { draw(prev, t, 1, 1 - local / P.fade); }
+      else { draw(prev, t, 1, 1); draw(cur, t, p, local / P.fade); }
+    } else draw(cur, t, p, 1);
+    drawAccent(x, cur, t, P, bEnv);
+    // зерно
+    const gr = grainTiles()[(Math.floor(t * 24)) % 4];
+    x.globalAlpha = P.grain * 0.5; x.globalCompositeOperation = 'overlay';
+    for (let gx = 0; gx < ZONE.w; gx += 256) for (let gy = 0; gy < ZONE.h; gy += 256) x.drawImage(gr, gx, gy);
+    x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+    if (P.tech === 'film') { x.fillStyle = 'rgba(232,120,40,0.92)'; x.font = `600 22px ${FONTS.mono}`; x.textAlign = 'right'; x.fillText(filmStamp(day.date), ZONE.w - 50, ZONE.h - 40); x.textAlign = 'left'; }
+    x.restore();
+
+    // ---- постоянный каркас ----
+    const ink = P.ink;
+    x.fillStyle = ink; x.font = `500 17px ${FONTS.mono}`; x.textBaseline = 'alphabetic';
+    const dt = new Date(day.date);
+    x.fillText(`ІЗ · № ${String(day.num || 1).padStart(3, '0')}`, M, 62);
+    x.textAlign = 'right'; x.fillText(`${String(dt.getDate()).padStart(2, '0')}.${String(dt.getMonth() + 1).padStart(2, '0')}.${dt.getFullYear()} · ${WD[dt.getDay()]}`, W - M, 62); x.textAlign = 'left';
+    x.strokeStyle = rgba(ink, 0.6); x.lineWidth = 1; x.beginPath(); x.moveTo(M, 78); x.lineTo(W - M, 78); x.stroke();
+    // технический ярлык приёма (маленький, мелким капсом)
+    x.font = `500 12px ${FONTS.mono}`; x.fillStyle = rgba(ink, 0.55);
+    x.fillText(TECH[P.tech].name.toUpperCase() + (P.accent ? ' + ' + TECH[P.accent].name.toUpperCase() : ''), M, 96);
+
+    // название
+    const ty = 948, tIn = clamp((t - 0.3) / 1.2);
+    x.globalAlpha = tIn;
+    if (P.type.title === 'serif') { x.font = `600 56px ${FONTS.serif}`; } else { x.font = `700 40px ${FONTS.grotesk}`; }
+    x.fillStyle = ink;
+    const tl = wrap(x, day.title, W - 2 * M - 90, 2);
+    tl.forEach((l, i) => x.fillText(P.type.title === 'grotesk' ? l.toUpperCase() : l, M, ty + i * (P.type.title === 'serif' ? 56 : 48) + (1 - tIn) * 10));
+    x.globalAlpha = 1;
+    // подпись (печатается)
+    const capY = ty + (tl.length - 1) * (P.type.title === 'serif' ? 56 : 48) + 48;
+    const capFont = { hand: `500 34px ${FONTS.hand}`, mono: `400 19px ${FONTS.mono}`, serifItalic: `italic 500 28px ${FONTS.serif}` }[P.type.caption];
+    const capLH = { hand: 36, mono: 27, serifItalic: 32 }[P.type.caption];
+    x.font = capFont; x.fillStyle = rgba(ink, 0.82);
+    const cap = '«' + (day.analysis.text.caption || '') + '»';
+    const shown = opts.still ? cap : cap.slice(0, Math.floor(clamp((t - 1.2) / Math.max(2, cap.length * 0.045)) * cap.length));
+    wrap(x, shown, W - 2 * M - 10, 3).forEach((l, i) => x.fillText(l, M, capY + i * capLH));
+
+    // полоса музыки (постоянный элемент: огибающая песни + плейхед)
+    const my = 1186, mw = W - 2 * M - 110, curve = day.analysis.music.curve || [];
+    const prog = clamp(t / P.duration), nb = 48;
+    for (let i = 0; i < nb; i++) {
+      const v = curve[Math.floor(i / nb * curve.length)] || 0.3, h = 4 + v * 34, xx = M + i * (mw / nb);
+      x.fillStyle = i / nb < prog ? P.accentCol : rgba(ink, 0.25); x.fillRect(xx, my - h, mw / nb - 3, h);
+    }
+    x.font = `400 14px ${FONTS.mono}`; x.fillStyle = rgba(ink, 0.75);
+    const song = day.song || {}, mu = day.analysis.music;
+    const songLabel = [song.artist, song.title].filter(Boolean).join(' — ') || song.name || 'песня дня';
+    x.fillText('♪ ' + songLabel.slice(0, 44), M, my + 26);
+    x.fillStyle = rgba(ink, 0.5); x.fillText(`${mu.bpm} BPM · ${mu.key} · ${mu.genre}`, M, my + 46);
+    // компас дня: V по горизонтали, A по вертикали
+    const cx = W - M - 42, cy = my - 4, R = 40;
+    x.strokeStyle = rgba(ink, 0.7); x.lineWidth = 1.2; x.beginPath(); x.arc(cx, cy, R, 0, 7); x.stroke();
+    x.strokeStyle = rgba(ink, 0.25); x.beginPath(); x.moveTo(cx - R, cy); x.lineTo(cx + R, cy); x.moveTo(cx, cy - R); x.lineTo(cx, cy + R); x.stroke();
+    const dx = cx + P.V * R * 0.82, dy = cy - (P.A - 0.5) * 2 * R * 0.82;
+    x.fillStyle = P.accentCol; x.beginPath(); x.arc(dx, dy, 7 + bEnv * 2, 0, 7); x.fill(); x.strokeStyle = ink; x.lineWidth = 1.5; x.stroke();
+    x.font = `400 10px ${FONTS.mono}`; x.fillStyle = rgba(ink, 0.55); x.textAlign = 'center';
+    x.fillText('ЯРКО', cx, cy - R - 6); x.fillText('ТИХО', cx, cy + R + 14); x.textAlign = 'left';
+    // печать «ма» — постоянно для приёма ма, иначе маленькая подпись
+    if (P.tech === 'ma' || P.accent === 'ma') {
+      x.fillStyle = '#b8322a'; x.fillRect(W - M - 60, 905, 46, 46); x.fillStyle = P.paper; x.font = `700 28px ${FONTS.serif}`; x.textAlign = 'center'; x.fillText(day.title.charAt(0), W - M - 37, 938); x.textAlign = 'left';
+    }
+    x.strokeStyle = rgba(ink, 0.6); x.lineWidth = 1; x.beginPath(); x.moveTo(M, H - 34); x.lineTo(W - M, H - 34); x.stroke();
+    x.font = `400 11px ${FONTS.mono}`; x.fillStyle = rgba(ink, 0.5); x.fillText('дневник атмосферы дня', M, H - 16);
+    x.textAlign = 'right'; x.fillText(`V ${P.V >= 0 ? '+' : ''}${P.V.toFixed(2)} · A ${P.A.toFixed(2)} · W ${P.W >= 0 ? '+' : ''}${P.W.toFixed(2)}`, W - M, H - 16); x.textAlign = 'left';
+    x.restore();
+  }
+
+  G.IZ.render = { W, H, prepare, drawFrame, FONTS, hashStr, rng, cover, mk };
+})(window);
+
+</script>
+<script>
+/* ---- js/demo.js ---- */
+/* demo.js — демонстрационные дни. Фото рисуются процедурно (без чужих снимков),
+ * музыка синтезируется в браузере (OfflineAudioContext) — свободная лицензия, ничего не скачивается.
+ * Демо-дни проходят через тот же конвейер анализа, что и записи пользователя. */
+(function (G) {
+  'use strict';
+  const { rng, mk } = G.IZ.render;
+  const PW = 800, PH = 1000;
+
+  /* ---------- процедурные «фотографии» ---------- */
+  function sky(x, top, bot, h = PH) { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, top); g.addColorStop(1, bot); x.fillStyle = g; x.fillRect(0, 0, PW, h); }
+  function blobs(x, r, cx, cy, rad, cols, n, alpha = 0.8) { for (let i = 0; i < n; i++) { const a = r() * 6.28, d = Math.sqrt(r()) * rad; x.fillStyle = cols[(r() * cols.length) | 0]; x.globalAlpha = alpha * (0.5 + r() * 0.5); x.beginPath(); x.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.8, 10 + r() * rad * 0.25, 0, 7); x.fill(); } x.globalAlpha = 1; }
+  function person(x, px, py, s, col, opt = {}) {
+    x.fillStyle = col; x.beginPath(); x.arc(px, py - s * 1.55, s * 0.28, 0, 7); x.fill();
+    x.beginPath(); x.moveTo(px - s * 0.42, py); x.quadraticCurveTo(px - s * 0.5, py - s * 1.25, px, py - s * 1.25); x.quadraticCurveTo(px + s * 0.5, py - s * 1.25, px + s * 0.42, py); x.closePath(); x.fill();
+    if (opt.umbrella) { x.fillStyle = opt.umbrella; x.beginPath(); x.arc(px, py - s * 1.9, s * 0.95, Math.PI, 0); x.fill(); x.strokeStyle = col; x.lineWidth = 3; x.beginPath(); x.moveTo(px, py - s * 1.9); x.lineTo(px, py - s * 1.1); x.stroke(); }
+    if (opt.arms) { x.strokeStyle = col; x.lineWidth = s * 0.14; x.lineCap = 'round'; x.beginPath(); x.moveTo(px - s * 0.3, py - s * 1.05); x.lineTo(px - s * 0.75, py - s * 1.8); x.moveTo(px + s * 0.3, py - s * 1.05); x.lineTo(px + s * 0.75, py - s * 1.8); x.stroke(); }
+  }
+  function mug(x, mx, my, s, col, foam) { x.fillStyle = col; x.beginPath(); x.moveTo(mx - s, my - s * 1.2); x.lineTo(mx + s, my - s * 1.2); x.lineTo(mx + s * 0.85, my); x.lineTo(mx - s * 0.85, my); x.closePath(); x.fill();
+    x.strokeStyle = col; x.lineWidth = s * 0.22; x.beginPath(); x.arc(mx + s * 1.05, my - s * 0.65, s * 0.35, -1.4, 1.4); x.stroke();
+    x.fillStyle = foam; x.beginPath(); x.ellipse(mx, my - s * 1.2, s, s * 0.22, 0, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,0.35)'; x.lineWidth = 4; for (let i = -1; i <= 1; i++) { x.beginPath(); x.moveTo(mx + i * s * 0.4, my - s * 1.5); x.bezierCurveTo(mx + i * s * 0.4 - 18, my - s * 2, mx + i * s * 0.4 + 18, my - s * 2.4, mx + i * s * 0.4, my - s * 2.9); x.stroke(); } }
+  function finish(c, r, { blur = 0.6, vign = 0.35, noise = 14, warm = 0 } = {}) {
+    const x = c.getContext('2d');
+    if (blur) { const t = mk(PW, PH); const tx = t.getContext('2d'); tx.filter = `blur(${blur}px)`; tx.drawImage(c, 0, 0); x.clearRect(0, 0, PW, PH); x.drawImage(t, 0, 0); }
+    const g = x.createRadialGradient(PW / 2, PH / 2, PH * 0.3, PW / 2, PH / 2, PH * 0.75); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${vign})`); x.fillStyle = g; x.fillRect(0, 0, PW, PH);
+    if (warm) { x.fillStyle = warm > 0 ? `rgba(255,150,60,${warm})` : `rgba(60,110,200,${-warm})`; x.globalCompositeOperation = 'soft-light'; x.fillRect(0, 0, PW, PH); x.globalCompositeOperation = 'source-over'; }
+    const d = x.getImageData(0, 0, PW, PH); for (let i = 0; i < d.data.length; i += 4) { const n = (r() - 0.5) * noise; d.data[i] += n; d.data[i + 1] += n; d.data[i + 2] += n; } x.putImageData(d, 0, 0);
+    return c;
+  }
+
+  const SCENES = {
+    park(v, seed) {
+      const r = rng(seed), c = mk(PW, PH), x = c.getContext('2d');
+      sky(x, '#b9c6cf', '#f1d9a8', 600); x.fillStyle = '#f6d58a'; x.globalAlpha = 0.85; x.beginPath(); x.arc(600, 420, 70, 0, 7); x.fill(); x.globalAlpha = 1;
+      const gg = x.createLinearGradient(0, 560, 0, PH); gg.addColorStop(0, '#c8913f'); gg.addColorStop(1, '#7a4a1e'); x.fillStyle = gg; x.fillRect(0, 560, PW, PH - 560);
+      for (let i = 0; i < 7; i++) { const tx = 40 + i * 120 + r() * 40, th = 300 + r() * 120; x.fillStyle = '#3d2a1c'; x.fillRect(tx - 9, 600 - th * 0.55, 18, th * 0.6 + 20);
+        blobs(x, r, tx, 600 - th * 0.7, 120, ['#e8a33a', '#d9772b', '#f2c14e', '#b8541f', '#e9c46a'], 60, 0.75); }
+      if (v === 2) { x.fillStyle = '#5d7f86'; x.beginPath(); x.ellipse(400, 800, 380, 110, 0, 0, 7); x.fill(); for (let i = 0; i < 40; i++) { x.fillStyle = ['#e8a33a', '#f2c14e', '#d9772b'][i % 3]; x.globalAlpha = 0.5; x.fillRect(80 + r() * 640, 740 + r() * 120, 40 + r() * 60, 4); } x.globalAlpha = 1; }
+      else { x.fillStyle = '#d7b27a'; x.beginPath(); x.moveTo(330, PH); x.quadraticCurveTo(420, 760, 400, 600); x.lineTo(440, 600); x.quadraticCurveTo(480, 760, 560, PH); x.fill(); }
+      for (let i = 0; i < 260; i++) { x.fillStyle = ['#e8a33a', '#d9772b', '#f2c14e', '#a94b1a'][i % 4]; x.save(); x.translate(r() * PW, 600 + r() * 400); x.rotate(r() * 3); x.fillRect(-6, -3, 12, 6); x.restore(); }
+      if (v === 0) { x.fillStyle = '#3a2618'; x.fillRect(250, 800, 300, 14); x.fillRect(260, 814, 10, 60); x.fillRect(530, 814, 10, 60); person(x, 340, 800, 90, '#2b1e16'); person(x, 450, 800, 84, '#4a2c22'); }
+      if (v === 1) { x.fillStyle = '#5a3a26'; x.fillRect(0, 720, PW, 60); mug(x, 300, 730, 80, '#8a3f2b', '#e8c9a0'); mug(x, 520, 740, 72, '#2f5d62', '#d9b48a'); }
+      return finish(c, r, { warm: 0.18 });
+    },
+    office(v, seed) {
+      const r = rng(seed), c = mk(PW, PH), x = c.getContext('2d');
+      sky(x, '#0c1424', '#1b2638');
+      x.fillStyle = '#0a1020'; x.fillRect(60, 80, 680, 520);
+      for (let i = 0; i < 14; i++) { const bx = 60 + i * 50, bh = 120 + r() * 360; x.fillStyle = '#131d33'; x.fillRect(bx, 600 - bh, 46, bh);
+        for (let wy = 600 - bh + 10; wy < 590; wy += 18) for (let wx = bx + 6; wx < bx + 40; wx += 12) if (r() < 0.35) { x.fillStyle = r() < 0.7 ? '#f3d27a' : '#7fd8f0'; x.globalAlpha = 0.8; x.fillRect(wx, wy, 6, 9); x.globalAlpha = 1; } }
+      x.strokeStyle = '#2a364d'; x.lineWidth = 10; x.strokeRect(60, 80, 680, 520); x.beginPath(); x.moveTo(400, 80); x.lineTo(400, 600); x.stroke();
+      x.fillStyle = '#1e2430'; x.fillRect(0, 700, PW, 300);
+      if (v !== 2) { const g = x.createRadialGradient(400, 640, 20, 400, 640, 360); g.addColorStop(0, 'rgba(110,200,255,0.45)'); g.addColorStop(1, 'rgba(110,200,255,0)'); x.fillStyle = g; x.fillRect(0, 300, PW, 700);
+        x.fillStyle = '#0d1118'; x.fillRect(220, 470, 360, 230); x.fillStyle = '#16304a'; x.fillRect(236, 486, 328, 196);
+        for (let i = 0; i < 12; i++) { x.fillStyle = ['#7fd8f0', '#e86a5a', '#f3d27a', '#9aa7ff'][i % 4]; x.fillRect(250 + (i % 3) * 18, 500 + i * 14, 60 + r() * 180, 6); }
+        x.fillStyle = '#0d1118'; x.fillRect(380, 700, 40, 40); }
+      if (v === 1) { mug(x, 640, 850, 50, '#e9e5dc', '#3b2416'); x.fillStyle = '#2b3444'; x.fillRect(100, 820, 260, 18); }
+      if (v === 2) { for (let i = 0; i < 6; i++) { x.fillStyle = 'rgba(200,235,255,0.75)'; x.fillRect(80 + i * 110, 650, 70, 6); } person(x, 300, 980, 160, '#0b0f17'); person(x, 560, 990, 150, '#101622'); }
+      return finish(c, r, { warm: -0.2, vign: 0.5 });
+    },
+    sea(v, seed) {
+      const r = rng(seed), c = mk(PW, PH), x = c.getContext('2d');
+      sky(x, '#4fb3e8', '#bfe8f7', 460); x.fillStyle = '#fff3b0'; x.beginPath(); x.arc(640, 140, 60, 0, 7); x.fill();
+      const sg = x.createLinearGradient(0, 460, 0, 720); sg.addColorStop(0, '#1497b8'); sg.addColorStop(1, '#4fd1c5'); x.fillStyle = sg; x.fillRect(0, 460, PW, 260);
+      x.strokeStyle = 'rgba(255,255,255,0.7)'; x.lineWidth = 3; for (let i = 0; i < 30; i++) { const yy = 480 + r() * 230, xx = r() * PW; x.beginPath(); x.moveTo(xx, yy); x.quadraticCurveTo(xx + 20, yy - 6, xx + 40, yy); x.stroke(); }
+      const sa = x.createLinearGradient(0, 700, 0, PH); sa.addColorStop(0, '#f7d9a0'); sa.addColorStop(1, '#e8b873'); x.fillStyle = sa; x.fillRect(0, 700, PW, 300);
+      if (v === 0) { [[160, 760, '#e63946'], [600, 740, '#ffb703']].forEach(([ux, uy, uc]) => { x.fillStyle = uc; x.beginPath(); x.arc(ux, uy, 110, Math.PI, 0); x.fill(); x.fillStyle = '#fff'; x.beginPath(); x.moveTo(ux, uy); x.arc(ux, uy, 110, Math.PI * 1.33, Math.PI * 1.66); x.fill(); x.fillStyle = '#5b4636'; x.fillRect(ux - 3, uy, 6, 150); });
+        person(x, 330, 690, 70, '#1d3557', { arms: true }); person(x, 450, 700, 64, '#8d2c2c', { arms: true }); person(x, 540, 690, 60, '#264653'); }
+      if (v === 1) { for (let i = 0; i < 3; i++) { const wx = 200 + i * 200, wy = 860; x.fillStyle = '#2a9d4b'; x.beginPath(); x.arc(wx, wy, 95, Math.PI * 1.05, Math.PI * 1.95); x.fill(); x.fillStyle = '#ff5d6c'; x.beginPath(); x.arc(wx, wy + 6, 82, Math.PI * 1.07, Math.PI * 1.93); x.fill(); x.fillStyle = '#222'; for (let k = 0; k < 6; k++) { x.beginPath(); x.ellipse(wx - 50 + k * 20, wy - 40 + (k % 2) * 14, 3, 6, 0, 0, 7); x.fill(); } } }
+      if (v === 2) { for (let i = 0; i < 5; i++) person(x, 120 + i * 140, 640 + (i % 2) * 20, 55 + r() * 15, '#103a4a', { arms: i % 2 === 0 }); x.fillStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 40; i++) { x.beginPath(); x.arc(r() * PW, 600 + r() * 100, 3 + r() * 6, 0, 7); x.fill(); } }
+      return finish(c, r, { warm: 0.1, vign: 0.2 });
+    },
+    snowcity(v, seed) {
+      const r = rng(seed), c = mk(PW, PH), x = c.getContext('2d');
+      sky(x, '#d9dde4', '#f1e4e2');
+      for (let i = 0; i < 10; i++) { const bx = i * 85 - 20, bh = 200 + r() * 260; x.fillStyle = `rgba(150,160,178,${0.35 + r() * 0.3})`; x.fillRect(bx, 640 - bh, 80, bh); for (let k = 0; k < 8; k++) if (r() < 0.25) { x.fillStyle = 'rgba(255,220,160,0.7)'; x.fillRect(bx + 10 + r() * 50, 640 - bh + 20 + r() * (bh - 40), 8, 10); } }
+      x.fillStyle = '#f4f5f7'; x.fillRect(0, 640, PW, 360);
+      x.strokeStyle = 'rgba(160,170,190,0.5)'; x.lineWidth = 2; x.beginPath(); x.moveTo(300, PH); x.lineTo(390, 640); x.moveTo(500, PH); x.lineTo(410, 640); x.stroke();
+      if (v !== 1) { [[150, 0.9], [650, 0.7]].forEach(([lx, s]) => { x.fillStyle = '#4a4f5a'; x.fillRect(lx - 4, 640 - 300 * s, 8, 300 * s + 120); const g = x.createRadialGradient(lx, 640 - 300 * s, 4, lx, 640 - 300 * s, 70); g.addColorStop(0, 'rgba(255,214,150,0.9)'); g.addColorStop(1, 'rgba(255,214,150,0)'); x.fillStyle = g; x.fillRect(lx - 80, 640 - 300 * s - 80, 160, 160); }); }
+      if (v === 0) person(x, 420, 760, 46, '#3b3f4a');
+      if (v === 1) { x.fillStyle = '#6b5f57'; x.fillRect(0, 0, PW, 60); x.fillRect(0, 0, 60, PH); x.fillRect(PW - 60, 0, 60, PH); x.fillRect(0, 760, PW, 240); mug(x, 400, 760, 70, '#c9c2b8', '#8a6a4a');
+        for (let i = 0; i < 70; i++) { x.strokeStyle = 'rgba(255,255,255,0.5)'; x.lineWidth = 1.5; const fx = 60 + r() * 680, fy = 60 + r() * 700, s = 6 + r() * 16; for (let a = 0; a < 3; a++) { x.beginPath(); x.moveTo(fx - Math.cos(a) * s, fy - Math.sin(a) * s); x.lineTo(fx + Math.cos(a) * s, fy + Math.sin(a) * s); x.stroke(); } } }
+      if (v === 2) { x.fillStyle = '#6e6157'; x.fillRect(270, 800, 260, 14); x.fillRect(280, 814, 10, 50); x.fillRect(510, 814, 10, 50); x.fillStyle = '#fff'; x.fillRect(268, 792, 264, 10); }
+      x.fillStyle = 'rgba(255,255,255,0.9)'; for (let i = 0; i < 260; i++) { x.beginPath(); x.arc(r() * PW, r() * PH, 1 + r() * 3.5, 0, 7); x.fill(); }
+      return finish(c, r, { warm: -0.05, vign: 0.18, blur: 0.8 });
+    },
+    station(v, seed) {
+      const r = rng(seed), c = mk(PW, PH), x = c.getContext('2d');
+      sky(x, '#3e4a50', '#6c7a7c');
+      if (v === 1) { const g = x.createLinearGradient(0, 0, 0, PH); g.addColorStop(0, '#22303a'); g.addColorStop(1, '#3a464c'); x.fillStyle = g; x.fillRect(0, 0, PW, PH);
+        for (let i = 0; i < 40; i++) { const bg = x.createRadialGradient(0, 0, 0, 0, 0, 1); x.save(); x.translate(r() * PW, 200 + r() * 600); const rr = 20 + r() * 60; x.scale(rr, rr); bg.addColorStop(0, ['rgba(255,190,110,0.55)', 'rgba(255,120,90,0.45)', 'rgba(170,220,255,0.4)'][i % 3]); bg.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = bg; x.fillRect(-1, -1, 2, 2); x.restore(); }
+        for (let i = 0; i < 140; i++) { const dx = r() * PW, dy = r() * PH, s = 4 + r() * 9; x.fillStyle = 'rgba(220,235,240,0.35)'; x.beginPath(); x.ellipse(dx, dy, s * 0.7, s, 0, 0, 7); x.fill(); x.strokeStyle = 'rgba(255,255,255,0.18)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(dx, dy + s); x.lineTo(dx + (r() - 0.5) * 3, dy + s + 20 + r() * 50); x.stroke(); }
+        return finish(c, r, { warm: 0.05, vign: 0.45 }); }
+      x.fillStyle = '#2b3236'; x.fillRect(0, 120, PW, 30); for (let i = 0; i < 6; i++) x.fillRect(60 + i * 140, 150, 12, 360);
+      x.fillStyle = '#5b2d2a'; x.fillRect(-20, 380, 600, 200); x.fillStyle = '#3a1f1d'; x.fillRect(-20, 560, 600, 20);
+      for (let i = 0; i < 5; i++) { x.fillStyle = '#ffd59a'; x.globalAlpha = 0.85; x.fillRect(10 + i * 110, 420, 80, 70); x.globalAlpha = 1; }
+      const pg = x.createLinearGradient(0, 580, 0, PH); pg.addColorStop(0, '#4d585b'); pg.addColorStop(1, '#2a3134'); x.fillStyle = pg; x.fillRect(0, 580, PW, 420);
+      for (let i = 0; i < 5; i++) { x.fillStyle = 'rgba(255,213,154,0.18)'; x.fillRect(10 + i * 110, 600 + i * 6, 80, 260); }
+      if (v === 0) { person(x, 620, 900, 120, '#14181b', { umbrella: '#2d3a40' }); person(x, 700, 900, 110, '#1d2226'); }
+      if (v === 2) person(x, 400, 960, 150, '#101417', { umbrella: '#6b1f24' });
+      x.strokeStyle = 'rgba(210,225,230,0.35)'; x.lineWidth = 1.4; for (let i = 0; i < 420; i++) { const rx = r() * PW, ry = r() * PH; x.beginPath(); x.moveTo(rx, ry); x.lineTo(rx - 6, ry + 30); x.stroke(); }
+      return finish(c, r, { warm: -0.12, vign: 0.5 });
+    },
+    kitchen(v, seed) {
+      const r = rng(seed), c = mk(PW, PH), x = c.getContext('2d');
+      sky(x, '#e9b86a', '#b9773a');
+      x.fillStyle = '#2a4a78'; x.fillRect(420, 90, 320, 380); x.fillStyle = '#e8eef8'; for (let i = 0; i < 90; i++) { x.beginPath(); x.arc(420 + r() * 320, 90 + r() * 380, 1 + r() * 3, 0, 7); x.fill(); }
+      x.fillStyle = '#f2f4f8'; x.fillRect(420, 420, 320, 50); x.strokeStyle = '#7a4a22'; x.lineWidth = 14; x.strokeRect(420, 90, 320, 380); x.beginPath(); x.moveTo(580, 90); x.lineTo(580, 470); x.stroke();
+      const lg = x.createRadialGradient(240, 120, 10, 240, 120, 420); lg.addColorStop(0, 'rgba(255,230,160,0.8)'); lg.addColorStop(1, 'rgba(255,230,160,0)'); x.fillStyle = lg; x.fillRect(0, 0, PW, 700);
+      x.fillStyle = '#7b4a26'; x.fillRect(0, 640, PW, 360); x.fillStyle = '#8e5a30'; x.fillRect(0, 640, PW, 18);
+      if (v === 0) person(x, 230, 660, 170, '#5a2e22');
+      const plate = (px, py, s) => { x.fillStyle = '#f4efe6'; x.beginPath(); x.ellipse(px, py, s, s * 0.42, 0, 0, 7); x.fill(); x.fillStyle = '#d9d2c4'; x.beginPath(); x.ellipse(px, py, s * 0.75, s * 0.3, 0, 0, 7); x.fill();
+        for (let i = 0; i < 14; i++) { x.fillStyle = '#fbf6ec'; x.beginPath(); x.ellipse(px + (r() - 0.5) * s * 1.1, py + (r() - 0.5) * s * 0.35, s * 0.13, s * 0.08, r() * 3, 0, 7); x.fill(); x.strokeStyle = 'rgba(160,140,110,0.5)'; x.lineWidth = 1; x.stroke(); }
+        x.strokeStyle = 'rgba(255,255,255,0.45)'; x.lineWidth = 5; for (let i = 0; i < 3; i++) { x.beginPath(); x.moveTo(px - 40 + i * 40, py - 30); x.bezierCurveTo(px - 60 + i * 40, py - 90, px - 20 + i * 40, py - 120, px - 40 + i * 40, py - 170); x.stroke(); } };
+      plate(v === 1 ? 400 : 520, v === 1 ? 800 : 760, v === 1 ? 260 : 150);
+      if (v === 2) { for (let i = 0; i < 30; i++) { x.fillStyle = 'rgba(255,255,255,0.85)'; x.beginPath(); x.arc(r() * PW, 650 + r() * 300, 2 + r() * 5, 0, 7); x.fill(); } x.fillStyle = '#efe7d6'; x.beginPath(); x.ellipse(200, 860, 120, 40, 0, 0, 7); x.fill(); }
+      return finish(c, r, { warm: 0.22, vign: 0.4 });
+    }
+  };
+  function photoBlob(scene, v, seed) { return new Promise(res => SCENES[scene](v, seed).toBlob(res, 'image/jpeg', 0.88)); }
+
+  /* ---------- генеративная музыка ---------- */
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  async function synth({ bpm, mode, root = 57, style, dur = 24 }) {
+    const sr = 22050, ctx = new OfflineAudioContext(1, sr * dur, sr), out = ctx.createGain(); out.gain.value = 0.7;
+    const comp = ctx.createDynamicsCompressor(); out.connect(comp); comp.connect(ctx.destination);
+    const beat = 60 / bpm, bar = beat * 4;
+    const prog = mode === 'major' ? [[0, 4, 7], [5, 9, 12], [0, 4, 7], [7, 11, 14]] : [[0, 3, 7], [5, 8, 12], [0, 3, 7], [-2, 2, 5]];
+    const noise = ctx.createBuffer(1, sr, sr); const nd = noise.getChannelData(0); for (let i = 0; i < sr; i++) nd[i] = Math.random() * 2 - 1;
+    const tone = (f, t, d, type, vol, cutoff = 2400, att = 0.01) => { const o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter(); o.type = type; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = cutoff;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + att); g.gain.exponentialRampToValueAtTime(0.0008, t + d); o.connect(lp); lp.connect(g); g.connect(out); o.start(t); o.stop(t + d + 0.05); };
+    const nz = (t, d, vol, type, f) => { const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise; fl.type = type; fl.frequency.value = f; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + d); s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random() * 0.5); s.stop(t + d + 0.02); };
+    const kick = (t, v = 0.9) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.18); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.4); };
+    for (let b = 0; b * bar < dur; b++) {
+      const t0 = b * bar, ch = prog[b % 4];
+      if (style === 'electro') {
+        for (let i = 0; i < 4; i++) { kick(t0 + i * beat); nz(t0 + i * beat + beat / 2, 0.05, 0.25, 'highpass', 7000); }
+        nz(t0 + beat, 0.12, 0.3, 'bandpass', 1800); nz(t0 + 3 * beat, 0.12, 0.3, 'bandpass', 1800);
+        for (let i = 0; i < 16; i++) tone(mtof(root - 12 + ch[0] + (i % 4 === 3 ? 12 : 0)), t0 + i * beat / 4, beat / 4 * 0.9, 'sawtooth', 0.18, 900 + 600 * Math.sin(b + i * 0.4));
+        for (let i = 0; i < 8; i++) tone(mtof(root + 12 + ch[i % 3] + (i > 5 ? 12 : 0)), t0 + i * beat / 2, beat / 2 * 0.7, 'square', 0.06, 3000);
+      } else if (style === 'pop') {
+        kick(t0); kick(t0 + 2 * beat); nz(t0 + beat, 0.15, 0.35, 'bandpass', 2000); nz(t0 + 3 * beat, 0.15, 0.35, 'bandpass', 2000);
+        for (let i = 0; i < 8; i++) nz(t0 + i * beat / 2, 0.04, 0.15, 'highpass', 8000);
+        ch.forEach(n => tone(mtof(root + n), t0, bar * 0.95, 'triangle', 0.09, 2500, 0.05));
+        for (let i = 0; i < 4; i++) tone(mtof(root - 12 + ch[0]), t0 + i * beat, beat * 0.8, 'triangle', 0.3, 700);
+        for (let i = 0; i < 8; i++) if (i % 3 !== 2) tone(mtof(root + 12 + ch[(i * 2) % 3] + (i === 4 ? 2 : 0)), t0 + i * beat / 2, beat / 2, 'square', 0.05, 3200);
+      } else if (style === 'swing') {
+        const sw = beat * 2 / 3;
+        for (let i = 0; i < 4; i++) { tone(mtof(root - 12 + [ch[0], ch[1] - 12, ch[2] - 12, ch[1] - 12 + 2][i]), t0 + i * beat, beat * 0.9, 'triangle', 0.32, 600); if (i % 2) nz(t0 + i * beat, 0.25, 0.1, 'bandpass', 3000); nz(t0 + i * beat + sw, 0.08, 0.06, 'highpass', 6000); }
+        ch.concat([ch[0] + 11]).forEach(n => tone(mtof(root + n), t0 + beat * 0.05, bar * 0.9, 'sine', 0.07, 1800, 0.12));
+        if (b % 2 === 0) [0, 2, 4, 7].forEach((n, i) => tone(mtof(root + 12 + ch[0] + n + (mode === 'major' ? 0 : -1)), t0 + i * beat + (i % 2 ? sw - beat / 2 : 0), beat * 1.3, 'triangle', 0.08, 2200, 0.03));
+      } else if (style === 'ambient') {
+        ch.concat([ch[0] + 14]).forEach((n, i) => tone(mtof(root + n), t0 + i * 0.3, bar * 1.6, 'sine', 0.08, 1400, bar * 0.5));
+        tone(mtof(root - 24 + ch[0]), t0, bar * 1.4, 'sine', 0.18, 400, 1.2);
+        if (b % 2) tone(mtof(root + 24 + ch[1]), t0 + beat * 1.5, beat * 4, 'sine', 0.04, 3000, 0.4);
+      } else if (style === 'ballad') {
+        kick(t0, 0.45); nz(t0 + 2 * beat, 0.4, 0.12, 'bandpass', 1500);
+        for (let i = 0; i < 8; i++) tone(mtof(root + ch[[0, 1, 2, 1, 0, 2, 1, 2][i]] + (i > 3 ? 12 : 0)), t0 + i * beat / 2, beat * 1.5, 'triangle', 0.09, 1600, 0.005);
+        tone(mtof(root - 12 + ch[0]), t0, bar, 'sine', 0.28, 500, 0.05);
+        if (b % 2 === 1) tone(mtof(root + 12 + ch[2] - (mode === 'minor' ? 1 : 0)), t0 + beat, beat * 2.5, 'sine', 0.07, 2000, 0.2);
+      } else { // folk — «домбра»: щипковые двухголосия
+        for (let i = 0; i < 8; i++) { const n = i % 2 ? ch[1] : ch[0]; tone(mtof(root + n), t0 + i * beat / 2, beat * 0.6, 'sawtooth', 0.09, 1300, 0.003); tone(mtof(root + n + 7), t0 + i * beat / 2 + 0.012, beat * 0.5, 'sawtooth', 0.05, 1300, 0.003); }
+        kick(t0, 0.4); kick(t0 + 2 * beat, 0.3); nz(t0 + beat, 0.1, 0.12, 'bandpass', 900); nz(t0 + 3 * beat, 0.1, 0.12, 'bandpass', 900);
+        tone(mtof(root - 12 + ch[0]), t0, bar * 0.9, 'triangle', 0.2, 500, 0.02);
+      }
+    }
+    const buf = await ctx.startRendering();
+    return wav(buf);
+  }
+  function wav(buf) {
+    const d = buf.getChannelData(0), n = d.length, sr = buf.sampleRate, ab = new ArrayBuffer(44 + n * 2), v = new DataView(ab);
+    const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    ws(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); ws(8, 'WAVE'); ws(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); ws(36, 'data'); v.setUint32(40, n * 2, true);
+    let mx = 0; for (let i = 0; i < n; i++) mx = Math.max(mx, Math.abs(d[i])); const k = mx > 0 ? 0.92 / mx : 1;
+    for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, d[i] * k)) * 32767, true);
+    return new Blob([ab], { type: 'audio/wav' });
+  }
+
+  const DAYS = [
+    { date: '2026-10-11T17:40', scene: 'park', seed: 11,
+      text: 'Гуляли с подругой по парку, всё в жёлтых листьях. Было холодно, но мы пили какао и долго разговаривали. Солнце садилось низко, листья шуршали под ногами, пахло мокрой корой. Сидели на скамейке у пруда, пока не замёрзли руки. Тихо и очень тепло внутри.',
+      song: { kind: 'link', url: 'https://www.youtube.com/results?search_query=Frank+Sinatra+Autumn+in+New+York', artist: 'Frank Sinatra', title: 'Autumn in New York', genre: 'джаз', year: '1957', tempo: 'slow', mood: 'light' } },
+    { date: '2026-11-19T03:10', scene: 'office', seed: 22,
+      text: 'Срочная сдача проекта, всю ночь в офисе. Кофе за кофе, в наушниках электроника, дедлайн в 9 утра. Нервы на пределе, команда носилась между столами, сервер падал дважды. Успели в последнюю минуту!',
+      song: { kind: 'gen', gen: { bpm: 128, mode: 'minor', root: 57, style: 'electro' }, artist: 'Із · генеративный трек', title: 'Deadline Pulse', genre: 'техно' } },
+    { date: '2026-07-20T15:20', scene: 'sea', seed: 33,
+      text: 'Поехали с друзьями на море! Жара, солнце, мы бегом неслись в воду, ныряли в волны и хохотали. Ели холодный арбуз прямо на пляже, кто-то включил музыку, и мы танцевали на горячем песке. Счастье!',
+      song: { kind: 'gen', gen: { bpm: 120, mode: 'major', root: 60, style: 'pop' }, artist: 'Із · генеративный трек', title: 'Солёные волосы', genre: 'поп' } },
+    { date: '2026-02-08T08:05', scene: 'snowcity', seed: 44,
+      text: 'Проснулась рано, город ещё спал. Вышла одна пройтись: пустые улицы, свежий снег, никого вокруг. Тишина такая, что слышно, как снег скрипит под ногами. Долго стояла у фонаря и просто смотрела, как медленно падают снежинки.',
+      song: { kind: 'gen', gen: { bpm: 64, mode: 'major', root: 62, style: 'ambient' }, artist: 'Із · генеративный трек', title: 'Белый шум утра', genre: 'эмбиент' } },
+    { date: '2026-09-03T19:30', scene: 'station', seed: 55,
+      text: 'Провожала брата на вокзале: он уезжает учиться в другой город. Шёл дождь, перрон весь в лужах, мы стояли под одним зонтом и молчали. Вспомнили, как в детстве играли во дворе. Долго прощались. Поезд тронулся, и стало пусто и грустно.',
+      song: { kind: 'gen', gen: { bpm: 72, mode: 'minor', root: 57, style: 'ballad' }, artist: 'Із · генеративный трек', title: 'Последний вагон', genre: 'ретро-баллада' } },
+    { date: '2026-11-02T19:00', scene: 'kitchen', seed: 66,
+      text: 'Выпал первый снег! Вечером приехала к маме, на кухне пахло тестом и укропом, мы вместе лепили пельмени и слушали старые песни. За окном всё белое, а у нас тепло, уютно и смешно: мука на носу у обеих.',
+      song: { kind: 'gen', gen: { bpm: 96, mode: 'major', root: 62, style: 'folk' }, artist: 'Із · генеративный трек', title: 'Домбра у окна', genre: 'фолк, домбра' } }
+  ];
+
+  async function buildDemoInputs(onProgress) {
+    const out = [];
+    for (let i = 0; i < DAYS.length; i++) {
+      const d = DAYS[i]; onProgress && onProgress(i, DAYS.length);
+      const photos = [];
+      for (let v = 0; v < 3; v++) photos.push(await photoBlob(d.scene, v, d.seed * 10 + v));
+      let song = { ...d.song };
+      if (d.song.kind === 'gen') { song.blob = await synth({ ...d.song.gen, dur: 24 }); song.kind = 'file'; song.name = d.song.title + '.wav'; song.license = 'сгенерировано прототипом «Із», свободное использование'; delete song.gen; }
+      out.push({ date: d.date, text: d.text, photos, song, demo: true });
+    }
+    return out;
+  }
+
+  G.IZ.demo = { buildDemoInputs, synth, SCENES, photoBlob };
+})(window);
+
+</script>
+<script>
+/* ---- js/app.js ---- */
+/* app.js — интерфейс «Із»: запись дня → обработка → воспоминание → папка дня → архив. */
+(function (G) {
+  'use strict';
+  const IZ = G.IZ, R = IZ.render;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const uid = () => 'd' + Math.random().toString(36).slice(2, 9);
+
+  /* ---------- хранилище (IndexedDB, запасной вариант — память) ---------- */
+  const store = (() => {
+    let db = null; const mem = new Map();
+    const open = () => new Promise(res => {
+      try { const rq = indexedDB.open('iz-diary', 1); rq.onupgradeneeded = () => rq.result.createObjectStore('days', { keyPath: 'id' });
+        rq.onsuccess = () => { db = rq.result; res(); }; rq.onerror = () => res(); } catch (e) { res(); }
+    });
+    const tx = (mode, fn) => new Promise((res, rej) => { try { const t = db.transaction('days', mode), s = t.objectStore('days'); const r = fn(s); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); } catch (e) { rej(e); } });
+    return {
+      open,
+      async all() { if (!db) return [...mem.values()]; try { return await new Promise((res, rej) => { const r = db.transaction('days').objectStore('days').getAll(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); } catch (e) { return [...mem.values()]; } },
+      async put(d) { mem.set(d.id, d); if (db) try { await tx('readwrite', s => s.put(d)); } catch (e) { console.warn('IDB put', e); } },
+      async del(id) { mem.delete(id); if (db) try { await tx('readwrite', s => s.delete(id)); } catch (e) { } },
+      async clear() { mem.clear(); if (db) try { await tx('readwrite', s => s.clear()); } catch (e) { } },
+      persistent: () => !!db
+    };
+  })();
+
+  let DAYS = [];
+  const sortDays = () => DAYS.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach((d, i) => d.num = i + 1);
+  // номер дня входит в обложку: перерисовываем обложки, у которых номер устарел
+  async function refreshCovers() {
+    for (const d of DAYS) if (d.coverNum !== d.num) { try { d.cover = await renderCover(d); d.coverNum = d.num; await store.put(d); } catch (e) { console.warn(e); } }
+  }
+
+  /* ---------- возможности платформы (если страница открыта как артефакт) ---------- */
+  const cap = { tts: null, downloads: null };
+  if (G.claude && G.claude.use) {
+    G.claude.use('tts').then(t => { cap.tts = t; }).catch(() => { });
+    G.claude.use('downloads').then(d => { cap.downloads = d; }).catch(() => { });
+  }
+  async function saveFile(filename, blob) {
+    if (cap.downloads) {
+      try { await cap.downloads.save({ filename, data: blob }); return; } catch (e) {
+        try { await cap.downloads.save({ filename, data: new Uint8Array(await blob.arrayBuffer()) }); return; } catch (e2) { toast('Сохранение отклонено или недоступно'); return; }
+      }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 3200); }
+
+  /* ---------- конвейер ---------- */
+  async function loadImg(blob) { const url = URL.createObjectURL(blob); const img = new Image(); img.src = url; await img.decode(); return img; }
+  async function processDay(input, existing) {
+    const tx = IZ.analyzeText(input.text);
+    const imgs = []; for (const b of input.photos) imgs.push(await loadImg(b));
+    const ph = IZ.mergePhotos(imgs.map(IZ.analyzeImage));
+    const song = input.song || {};
+    let mu;
+    if (song.kind === 'file' && song.blob) { try { mu = await IZ.analyzeAudio(await song.blob.arrayBuffer()); } catch (e) { console.warn(e); mu = IZ.describedMusic(song); mu.note = 'файл не удалось декодировать — по описанию'; } }
+    else mu = IZ.describedMusic(song);
+    mu = IZ.finalizeMusic(mu, song);
+    const passport = IZ.buildPassport(tx, ph, mu, { title: input.title, forceTech: input.forceTech });
+    const day = { ...(existing || {}), id: (existing && existing.id) || uid(), date: input.date, text: input.text, photos: input.photos, song, demo: !!input.demo,
+      analysis: { text: tx, photo: ph, music: mu }, passport, title: passport.title, created: (existing && existing.created) || Date.now(), titleLocked: !!input.title };
+    day.cover = await renderCover(day, imgs);
+    return day;
+  }
+  const frameCache = new Map();
+  async function framesFor(day) {
+    const key = day.id + ':' + day.passport.tech + ':' + day.passport.palette.join();
+    if (frameCache.has(key)) return frameCache.get(key);
+    const imgs = []; for (const b of day.photos) imgs.push(await loadImg(b));
+    const f = R.prepare(day, imgs); frameCache.set(key, f); return f;
+  }
+  async function renderCover(day, imgs) {
+    const frames = imgs ? R.prepare(day, imgs) : await framesFor(day);
+    const c = R.mk(R.W, R.H), x = c.getContext('2d');
+    R.drawFrame(x, day, frames, Math.min(day.passport.sceneDur * 0.72, day.passport.duration - 0.1), { still: true });
+    const s = R.mk(R.W / 2, R.H / 2); s.getContext('2d').drawImage(c, 0, 0, R.W / 2, R.H / 2);
+    return s.toDataURL('image/jpeg', 0.86);
+  }
+
+  /* ---------- навигация ---------- */
+  function route() {
+    const h = location.hash.slice(1);
+    stopPlayer();
+    $$('.view').forEach(v => v.hidden = true); $$('.nav a').forEach(a => a.classList.remove('on'));
+    if (h.startsWith('day-')) { const d = DAYS.find(x => x.id === h.slice(4)); if (d) { showDay(d); return; } }
+    if (h === 'new') { $('#v-new').hidden = false; $('[href="#new"]').classList.add('on'); return; }
+    if (h === 'system') { $('#v-system').hidden = false; $('[href="#system"]').classList.add('on'); renderSystem(); return; }
+    $('#v-diary').hidden = false; $('[href="#diary"]').classList.add('on'); renderDiary();
+  }
+  G.addEventListener('hashchange', route);
+
+  /* ---------- дневник ---------- */
+  function renderDiary() {
+    const q = ($('#search').value || '').toLowerCase(), tf = $('#techFilter').value;
+    const list = DAYS.slice().reverse().filter(d => (!q || (d.title + ' ' + d.text).toLowerCase().includes(q)) && (!tf || d.passport.tech === tf));
+    $('#feed').innerHTML = list.length ? list.map(d => `
+      <a class="card" href="#day-${d.id}" title="${esc(d.title)}">
+        <img src="${d.cover}" alt="${esc(d.title)}" loading="lazy">
+        <div class="cap"><span class="mono">${fmtDate(d.date)} · № ${String(d.num).padStart(3, '0')}</span><b>📁 ${esc(d.title)}</b><span class="mono dim">${IZ.TECH[d.passport.tech].name}${d.demo ? ' · демо' : ''}</span></div>
+      </a>`).join('') : `<p class="empty">Пока пусто. <a href="#new">Запишите первый день →</a></p>`;
+    $('#count').textContent = `${DAYS.length} ${plural(DAYS.length, 'день', 'дня', 'дней')}`;
+    $('#storeNote').textContent = store.persistent() ? 'Дневник хранится в этом браузере (IndexedDB).' : 'Хранилище браузера недоступно — записи живут до закрытия вкладки. Сохраняйте папки дней в .zip.';
+  }
+  const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; };
+  const fmtDate = d => { const t = new Date(d); return `${String(t.getDate()).padStart(2, '0')}.${String(t.getMonth() + 1).padStart(2, '0')}.${t.getFullYear()}`; };
+  $('#search').addEventListener('input', renderDiary); $('#techFilter').addEventListener('change', renderDiary);
+
+  /* ---------- день: плеер ---------- */
+  let player = null;
+  function stopPlayer() { if (!player) return; cancelAnimationFrame(player.raf); if (player.audio) { player.audio.pause(); } if (player.url) URL.revokeObjectURL(player.url); stopVoice(); player = null; }
+  async function showDay(day) {
+    $('#v-day').hidden = false;
+    const P = day.passport, mu = day.analysis.music, tx = day.analysis.text, s = day.song || {};
+    $('#dayTitle').textContent = day.title; $('#dayMeta').textContent = `${fmtDate(day.date)} · № ${String(day.num).padStart(3, '0')} · ${IZ.TECH[P.tech].name}${P.accent ? ' + ' + IZ.TECH[P.accent].name.toLowerCase() : ''}`;
+    $('#dayText').textContent = day.text;
+    // папка дня
+    const files = [['📄', 'запись.txt', `${day.text.length} знаков`]];
+    day.photos.forEach((b, i) => files.push(['🖼', `фото_${i + 1}.jpg`, `${Math.round(b.size / 1024)} КБ`]));
+    if (s.kind === 'file') files.push(['♪', s.name || 'песня', `${Math.round((s.blob && s.blob.size || 0) / 1024)} КБ · ${mu.bpm} BPM`]); else files.push(['♪', 'песня_ссылка.txt', IZ.serviceFromUrl(s.url) || 'ссылка']);
+    files.push(['▶', 'воспоминание.webm', day.video ? `${Math.round(day.video.size / 1024)} КБ` : 'запишите кнопкой «Видео»']);
+    files.push(['🖼', 'обложка.jpg', 'кадр страницы']);
+    files.push(['🗣', 'озвучка.json', `голос «${P.voice.label}», ×${P.voice.rate}`]);
+    files.push(['🧭', 'паспорт_дня.json', 'правила, по которым собран день']);
+    $('#folderName').textContent = '📁 ' + day.title;
+    $('#folder').innerHTML = files.map(f => `<li><span>${f[0]}</span><b>${esc(f[1])}</b><i>${esc(f[2])}</i></li>`).join('');
+    // почему так
+    $('#why').innerHTML = P.why.map(w => `<li><b>${esc(w.k)}</b> ${esc(w.v)}</li>`).join('') +
+      `<li><b>Баллы приёмов</b><div class="scores">${Object.entries(P.scores).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div><span>${IZ.TECH[k].name}</span><i style="width:${Math.max(2, Math.round(v / Math.max(...Object.values(P.scores)) * 100))}%"></i></div>`).join('')}</div></li>`;
+    $('#palette').innerHTML = P.palette.map(c => `<span style="background:${c}" title="${c}"></span>`).join('') + `<span style="background:${P.accentCol}" title="акцент ${P.accentCol}" class="acc"></span>`;
+    $('#inputs').innerHTML = `
+      <div><b>Текст</b> валентность ${tx.valence.toFixed(2)}, энергия ${tx.arousal.toFixed(2)}${tx.season ? ', сезон: ' + IZ.SEASON_RU[tx.season] : ''}${tx.time ? ', ' + IZ.TIME_RU[tx.time] : ''}${tx.place ? ', место: ' + tx.place.nom : ''}${tx.people.length ? ', ' + tx.people.join(', ') : ''}${tx.weather.length ? ', погода: ' + tx.weather.join('/') : ''}.
+        <span class="dim">Слова-сигналы: ${esc([...tx.found.pos, ...tx.found.neg, ...tx.found.hi, ...tx.found.lo].slice(0, 12).join(', ') || '—')}</span></div>
+      <div><b>Фото</b> ${day.analysis.photo.count} шт., яркость ${day.analysis.photo.lum.toFixed(2)}, насыщенность ${day.analysis.photo.sat.toFixed(2)}, тепло ${day.analysis.photo.warm.toFixed(2)}, контраст ${day.analysis.photo.contrast.toFixed(2)}.</div>
+      <div><b>Музыка</b> ${esc([s.artist, s.title].filter(Boolean).join(' — ') || s.name || '')}: ${mu.bpm} BPM, ${mu.key}, энергия ${mu.energy.toFixed(2)}, жанр ${esc(mu.genre)}, эпоха ${mu.era}. <span class="dim">${mu.source === 'audio' ? 'Аудиоанализ файла (темп, тональность, огибающая).' : 'По описанию: для ссылок аудио не скачивается.'}</span></div>`;
+    $('#songLink').innerHTML = s.kind === 'link' && s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">Открыть песню в ${esc(IZ.serviceFromUrl(s.url))} ↗</a>` : s.license ? `<span class="dim">${esc(s.license)}</span>` : '';
+    $('#techPick').value = day.forceTech || '';
+    $('#titleEdit').value = day.title;
+    // плеер
+    const frames = await framesFor(day);
+    const cv = $('#stage'), x = cv.getContext('2d');
+    player = { day, frames, t0: performance.now(), playing: false, t: 0 };
+    if (s.kind === 'file' && s.blob) { player.url = URL.createObjectURL(s.blob); player.audio = new Audio(player.url); player.audio.loop = true; }
+    const loop = () => {
+      if (!player) return;
+      let t;
+      if (player.playing) { t = player.audio && !player.audio.paused ? player.audio.currentTime % P.duration : ((performance.now() - player.t0) / 1000) % P.duration; player.t = t; }
+      else t = player.t;
+      R.drawFrame(x, day, frames, t);
+      $('#time').textContent = `${t.toFixed(1)} / ${P.duration.toFixed(0)} c`;
+      player.raf = requestAnimationFrame(loop);
+    };
+    loop();
+    $('#play').textContent = '▶ Смотреть';
+  }
+  $('#play').addEventListener('click', async () => {
+    if (!player) return;
+    if (player.playing) { player.playing = false; player.audio && player.audio.pause(); $('#play').textContent = '▶ Смотреть'; return; }
+    player.playing = true; player.t0 = performance.now() - player.t * 1000; $('#play').textContent = '❚❚ Пауза';
+    if (player.audio) { try { player.audio.currentTime = player.t; await player.audio.play(); } catch (e) { } }
+  });
+  $('#restart').addEventListener('click', () => { if (!player) return; player.t = 0; player.t0 = performance.now(); if (player.audio) player.audio.currentTime = 0; });
+
+  /* ---------- озвучка ---------- */
+  let speaking = false;
+  function stopVoice() { try { cap.tts && cap.tts.stop(); } catch (e) { } try { speechSynthesis.cancel(); } catch (e) { } speaking = false; const b = $('#voice'); if (b) b.textContent = '🗣 Озвучить'; }
+  $('#voice').addEventListener('click', async () => {
+    if (!player) return; if (speaking) { stopVoice(); return; }
+    const d = player.day, v = d.passport.voice; speaking = true; $('#voice').textContent = '■ Стоп';
+    const text = d.title + '. ' + d.text;
+    if (cap.tts) { try { await cap.tts.speak(text.slice(0, 1990), { voice: v.id, rate: Math.max(0.7, Math.min(1.5, v.rate)) }); } catch (e) { if (!speaking) return; fallbackSpeak(text, v); return; } stopVoice(); return; }
+    fallbackSpeak(text, v);
+  });
+  function fallbackSpeak(text, v) {
+    if (!('speechSynthesis' in G)) { toast('Синтез речи недоступен в этом браузере'); stopVoice(); return; }
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'ru-RU'; u.rate = v.rate; u.pitch = v.pitch;
+    const vs = speechSynthesis.getVoices().filter(x => /^ru/i.test(x.lang)); if (vs.length) u.voice = vs[Math.abs(R.hashStr(v.id)) % vs.length];
+    u.onend = () => stopVoice(); speechSynthesis.speak(u);
+  }
+
+  /* ---------- правка дня ---------- */
+  $('#rebuild').addEventListener('click', async () => {
+    if (!player) return; const d = player.day; const forced = $('#techPick').value || null; const title = $('#titleEdit').value.trim();
+    btnBusy('#rebuild', true);
+    const nd = await processDay({ date: d.date, text: d.text, photos: d.photos, song: d.song, demo: d.demo, title: title && title !== d.title ? title : (d.titleLocked ? d.title : ''), forceTech: forced }, d);
+    nd.forceTech = forced; delete nd.video;
+    nd.coverNum = null; DAYS = DAYS.map(x => x.id === d.id ? nd : x); sortDays(); await store.put(nd); await refreshCovers(); btnBusy('#rebuild', false); route(); toast('День пересобран');
+  });
+  $('#delete').addEventListener('click', async () => {
+    if (!player) return; const b = $('#delete');
+    if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = 'Точно удалить?'; setTimeout(() => { delete b.dataset.sure; b.textContent = 'Удалить день'; }, 3000); return; }
+    const id = player.day.id; DAYS = DAYS.filter(x => x.id !== id); sortDays(); await store.del(id); await refreshCovers(); location.hash = 'diary';
+  });
+
+  /* ---------- экспорт: видео и папка ---------- */
+  $('#record').addEventListener('click', async () => {
+    if (!player) return; const d = player.day, P = d.passport;
+    if (!G.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { toast('Запись видео не поддерживается этим браузером'); return; }
+    btnBusy('#record', true, 'Запись…');
+    const cv = R.mk(R.W, R.H), x = cv.getContext('2d'), frames = player.frames;
+    const vs = cv.captureStream(30); let tracks = [...vs.getVideoTracks()], ac, src, audio;
+    if (d.song.kind === 'file' && d.song.blob) {
+      try { ac = new AudioContext(); audio = new Audio(URL.createObjectURL(d.song.blob)); src = ac.createMediaElementSource(audio); const dest = ac.createMediaStreamDestination(); src.connect(dest); src.connect(ac.destination); tracks = tracks.concat(dest.stream.getAudioTracks()); } catch (e) { }
+    }
+    const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+    const rec = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime, videoBitsPerSecond: 5e6 } : {}), chunks = [];
+    rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    const done = new Promise(r => rec.onstop = r);
+    rec.start(250); if (audio) { audio.currentTime = 0; try { await audio.play(); } catch (e) { } }
+    const t0 = performance.now();
+    await new Promise(res => { const step = () => { const t = (performance.now() - t0) / 1000; R.drawFrame(x, d, frames, Math.min(t, P.duration)); $('#record').textContent = `Запись… ${Math.ceil(P.duration - t)} c`; if (t < P.duration) requestAnimationFrame(step); else res(); }; step(); });
+    rec.stop(); await done; if (audio) audio.pause(); if (ac) ac.close();
+    d.video = new Blob(chunks, { type: (mime || 'video/webm').split(';')[0] });
+    await store.put(d); btnBusy('#record', false);
+    await saveFile(`${safe(d.title)}.webm`, d.video); toast('Видео записано и добавлено в папку дня'); showDayFolderRefresh(d);
+  });
+  function showDayFolderRefresh(d) { const li = [...$$('#folder li')].find(l => l.textContent.includes('воспоминание')); if (li) li.querySelector('i').textContent = `${Math.round(d.video.size / 1024)} КБ`; }
+  const safe = s => s.replace(/[\\/:*?"<>|]/g, '').trim();
+  $('#zip').addEventListener('click', async () => {
+    if (!player) return; if (!G.JSZip) { toast('Библиотека архивации не загрузилась'); return; }
+    const d = player.day, z = new G.JSZip(), f = z.folder(safe(d.title));
+    f.file('запись.txt', `${d.title}\n${fmtDate(d.date)}\n\n${d.text}\n`);
+    d.photos.forEach((b, i) => f.file(`фото_${i + 1}.jpg`, b));
+    if (d.song.kind === 'file' && d.song.blob) f.file(d.song.name || 'песня.wav', d.song.blob);
+    else f.file('песня_ссылка.txt', `${[d.song.artist, d.song.title].filter(Boolean).join(' — ')}\n${d.song.url || ''}\n`);
+    if (d.video) f.file('воспоминание.webm', d.video);
+    const full = R.mk(R.W, R.H); R.drawFrame(full.getContext('2d'), d, player.frames, Math.min(d.passport.sceneDur * 0.72, d.passport.duration - 0.1), { still: true });
+    f.file('обложка.png', await new Promise(r => full.toBlob(r, 'image/png')));
+    f.file('озвучка.json', JSON.stringify({ text: d.text, voice: d.passport.voice, note: 'Озвучка синтезируется при просмотре по этим параметрам' }, null, 2));
+    const { why, ...pp } = d.passport;
+    f.file('паспорт_дня.json', JSON.stringify({ title: d.title, date: d.date, passport: pp, rules: why, analysis: { text: { ...d.analysis.text }, photo: d.analysis.photo, music: { ...d.analysis.music, curve: undefined } } }, null, 2));
+    const blob = await z.generateAsync({ type: 'blob' }); await saveFile(`${safe(d.title)}.zip`, blob);
+  });
+  function btnBusy(sel, on, label) { const b = $(sel); if (on) { b.dataset.l = b.textContent; b.disabled = true; if (label) b.textContent = label; } else { b.disabled = false; b.textContent = b.dataset.l || b.textContent; } }
+
+  /* ---------- новая запись ---------- */
+  let newPhotos = [];
+  const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); $('#fDate').value = now.toISOString().slice(0, 16);
+  $('#fPhotos').addEventListener('change', e => { newPhotos = newPhotos.concat([...e.target.files].filter(f => /^image\//.test(f.type))); thumbs(); e.target.value = ''; });
+  function thumbs() { $('#thumbs').innerHTML = newPhotos.map((f, i) => `<figure><img src="${URL.createObjectURL(f)}"><button type="button" data-i="${i}" aria-label="убрать">×</button></figure>`).join(''); }
+  $('#thumbs').addEventListener('click', e => { if (e.target.dataset.i != null) { newPhotos.splice(+e.target.dataset.i, 1); thumbs(); } });
+  $$('input[name=songKind]').forEach(r => r.addEventListener('change', () => { const k = $('input[name=songKind]:checked').value; $('#songLinkBox').hidden = k !== 'link'; $('#songFileBox').hidden = k !== 'file'; }));
+  // перетаскивание файлов
+  const drop = $('#dropzone');
+  ['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const fs = [...e.dataTransfer.files]; newPhotos = newPhotos.concat(fs.filter(f => /^image\//.test(f.type))); const au = fs.find(f => /^audio\//.test(f.type)); if (au) { const dt = new DataTransfer(); dt.items.add(au); $('#fAudio').files = dt.files; $('#kFile').checked = true; $('#kFile').dispatchEvent(new Event('change')); } thumbs(); });
+  $('#newForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const text = $('#fText').value.trim(), kind = $('input[name=songKind]:checked').value;
+    const err = [];
+    if (text.length < 15) err.push('напишите о дне хотя бы пару предложений');
+    if (!newPhotos.length) err.push('добавьте минимум одно фото');
+    const audioF = $('#fAudio').files[0], url = $('#fUrl').value.trim();
+    if (kind === 'link' && !/^https?:\/\//.test(url)) err.push('вставьте ссылку на песню');
+    if (kind === 'file' && !audioF) err.push('выберите аудиофайл');
+    if (err.length) { $('#formErr').textContent = 'Чтобы собрать день: ' + err.join('; ') + '.'; return; }
+    $('#formErr').textContent = '';
+    const song = { kind, artist: $('#fArtist').value.trim(), title: $('#fSong').value.trim(), genre: $('#fGenre').value.trim(), year: $('#fYear').value.trim(), tempo: $('#fTempo').value, mood: $('#fMood').value };
+    if (kind === 'link') song.url = url; else { song.blob = audioF; song.name = audioF.name; }
+    btnBusy('#make', true, 'Собираю день…');
+    try {
+      await fontsReady;
+      const day = await processDay({ date: $('#fDate').value, text, photos: newPhotos.slice(), song, title: $('#fTitle').value.trim() });
+      DAYS.push(day); sortDays(); await store.put(day); await refreshCovers();
+      newPhotos = []; thumbs(); $('#newForm').reset(); $('#fDate').value = now.toISOString().slice(0, 16); $('#songLinkBox').hidden = false; $('#songFileBox').hidden = true;
+      location.hash = 'day-' + day.id;
+    } catch (ex) { console.error(ex); $('#formErr').textContent = 'Не получилось собрать день: ' + ex.message; }
+    btnBusy('#make', false);
+  });
+
+  /* ---------- страница «Система» ---------- */
+  function renderSystem() {
+    $('#techList').innerHTML = Object.entries(IZ.TECH).map(([k, t]) => {
+      const ex = DAYS.filter(d => d.passport.tech === k).slice(0, 3);
+      return `<article><h3>${t.name}</h3><p class="mono dim">${t.ref}</p><p><b>Что делает:</b> ${t.what}.</p><p><b>Почему:</b> ${t.why}.</p>
+        <p class="mono dim">Включается: ${{ monet: 'светлое спокойное (V≈+0.5, A≈0.3), природа, тёплый день', kandinsky: 'высокая энергия (A>0.75) при нейтральной/тёмной валентности, синтетический звук, город, ночь', matisse: 'радость + энергия (V≈+0.75, A≈0.7), рядом люди, лето', ma: 'очень тихо (A≈0.1), нейтрально, в записи никого нет, зима/утро, эмбиент', film: 'светлая печаль (V≈−0.45), ностальгия, песня старше 1990-х, дождь' }[k]}</p>
+        <div class="mini">${ex.map(d => `<a href="#day-${d.id}"><img src="${d.cover}" alt=""></a>`).join('')}</div></article>`;
+    }).join('');
+  }
+
+  /* ---------- демо ---------- */
+  async function seedDemo() {
+    $('#loader').hidden = false;
+    const inputs = await IZ.demo.buildDemoInputs((i, n) => $('#loaderText').textContent = `Готовлю демо-дни: ${i + 1} из ${n}…`);
+    for (const inp of inputs) { const d = await processDay(inp); DAYS.push(d); await store.put(d); }
+    sortDays(); await refreshCovers(); $('#loader').hidden = true;
+  }
+  $('#resetDemo').addEventListener('click', async () => {
+    const b = $('#resetDemo'); if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = 'Стереть всё и вернуть демо?'; setTimeout(() => { delete b.dataset.sure; b.textContent = 'Сбросить к демо'; }, 3000); return; }
+    await store.clear(); DAYS = []; frameCache.clear(); await seedDemo(); location.hash = 'diary'; route();
+  });
+
+  const fontsReady = (async () => {
+    try { await Promise.race([Promise.all(['600 56px "Cormorant Garamond"', 'italic 500 28px "Cormorant Garamond"', '500 34px "Caveat"', '500 17px "JetBrains Mono"', '700 40px "Unbounded"'].map(f => document.fonts.load(f, 'АаЯя'))), new Promise(r => setTimeout(r, 3500))]); } catch (e) { }
+  })();
+
+  (async function init() {
+    await store.open(); await fontsReady;
+    DAYS = await store.all();
+    if (!DAYS.length) await seedDemo();
+    sortDays(); await refreshCovers(); route();
+    G.IZ_APP = { DAYS: () => DAYS, processDay, framesFor, store };
+  })();
+})(window);
+
+</script>
+</body>
+</html>
