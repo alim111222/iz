@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Із — дневник атмосферы дня</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--paper:#f3eee5;--paper2:#ebe4d7;--ink:#1d1b19;--dim:#6f675d;--line:#cfc6b8;--acc:#b8322a;
+  --serif:"Cormorant Garamond",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace;--hand:"Caveat",cursive;--grot:"Unbounded",system-ui,sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+body{background-image:radial-gradient(rgba(90,70,50,.06) 1px,transparent 1px);background-size:5px 5px}
+a{color:inherit}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.02em}.dim{color:var(--dim)}
+header{display:flex;align-items:center;gap:24px;padding:18px clamp(16px,4vw,48px);border-bottom:1px solid var(--ink);position:sticky;top:0;background:rgba(243,238,229,.94);backdrop-filter:blur(6px);z-index:5}
+.logo{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1;text-decoration:none}
+.logo small{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--dim);margin-left:10px;letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.nav a{font-family:var(--mono);font-size:13px;text-decoration:none;padding:7px 12px;border:1px solid transparent;border-radius:999px}
+.nav a.on{border-color:var(--ink)}.nav a:hover{background:var(--paper2)}
+.nav a.cta{background:var(--ink);color:var(--paper)}
+main{padding:28px clamp(16px,4vw,48px) 80px;max-width:1500px;margin:0 auto}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.05;margin:0 0 8px}
+h1{font-size:clamp(34px,5vw,56px)}h2{font-size:30px}h3{font-size:24px}
+.lead{max-width:760px;color:var(--dim);margin:0 0 22px}
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 22px}
+input,textarea,select{font:inherit;color:inherit;background:#fbf8f2;border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+textarea{min-height:170px;resize:vertical;font-family:var(--serif);font-size:20px;line-height:1.4}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--ink);outline-offset:1px}
+.bar input,.bar select{width:auto;min-width:200px}
+button,.btn{font:500 14px var(--mono);border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button.primary{background:var(--ink);color:var(--paper)}button:disabled{opacity:.5;cursor:wait}
+button:hover:not(:disabled){transform:translateY(-1px)}
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px}
+.card{display:block;text-decoration:none;transition:transform .2s}
+.card:hover{transform:translateY(-4px) rotate(-.4deg)}
+.card img{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;box-shadow:0 1px 0 var(--line),0 14px 30px -18px rgba(40,30,20,.6);border-radius:3px}
+.cap{display:flex;flex-direction:column;gap:2px;padding:10px 2px}.cap b{font-family:var(--serif);font-size:20px;line-height:1.1;font-weight:600}
+.empty{font-family:var(--serif);font-size:24px}
+.day{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:36px;align-items:start}
+.stagewrap{position:sticky;top:96px}
+#stage{width:100%;aspect-ratio:9/16;display:block;border-radius:4px;box-shadow:0 20px 50px -25px rgba(40,30,20,.7);background:#ddd}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.panel{border-top:1px solid var(--ink);padding:14px 0 18px}
+.panel h3{display:flex;justify-content:space-between;align-items:baseline}
+.folder{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:13px}
+.folder li{display:grid;grid-template-columns:26px 1fr auto;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.folder i{color:var(--dim);font-style:normal}
+.why{margin:0;padding:0;list-style:none}.why li{padding:8px 0;border-bottom:1px dashed var(--line)}
+.why b{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;display:block;color:var(--dim)}
+.scores div{display:grid;grid-template-columns:190px 1fr;gap:8px;align-items:center;font-size:13px;margin:3px 0}
+.scores i{display:block;height:8px;background:var(--ink);border-radius:4px}
+.palette{display:flex;gap:6px;margin:6px 0}.palette span{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}.palette .acc{border-radius:4px}
+.inputs div{padding:6px 0;font-size:14px}.inputs b{font-family:var(--mono);font-size:12px;text-transform:uppercase;margin-right:6px}
+.daytext{font-family:var(--serif);font-size:21px;line-height:1.4;white-space:pre-wrap}
+.edit{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.form{display:grid;grid-template-columns:1.2fr 1fr;gap:28px}
+.field{margin-bottom:16px}.field label,.lab{display:block;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.drop{border:1.5px dashed var(--ink);border-radius:10px;padding:18px;text-align:center;cursor:pointer;background:#fbf8f2}.drop.over{background:var(--paper2)}
+.drop input{display:none}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.thumbs figure{margin:0;position:relative}.thumbs img{width:84px;height:105px;object-fit:cover;border-radius:4px}
+.thumbs button{position:absolute;top:-8px;right:-8px;width:24px;height:24px;padding:0;justify-content:center;background:var(--paper)}
+.seg{display:flex;gap:6px;margin-bottom:10px}.seg label{font:13px var(--mono);border:1px solid var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.seg input{display:none}.seg input:checked+span{font-weight:600}.seg label:has(input:checked){background:var(--ink);color:var(--paper)}
+.err{color:var(--acc);font-family:var(--mono);font-size:13px;min-height:18px}
+.note{font-size:13px;color:var(--dim);border-left:2px solid var(--line);padding-left:10px}
+.techlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.techlist article{border-top:1px solid var(--ink);padding-top:12px}
+.mini{display:flex;gap:6px}.mini img{width:62px;aspect-ratio:9/16;object-fit:cover;border-radius:2px}
+.rules{columns:2 340px;column-gap:36px}.rules p{break-inside:avoid;margin:0 0 12px}
+.loader{position:fixed;inset:0;background:rgba(243,238,229,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:20;font-family:var(--serif);font-size:26px}
+.loader .dot{width:16px;height:16px;border-radius:50%;background:var(--ink);animation:p 1s infinite alternate}@keyframes p{to{transform:scale(.4);opacity:.3}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,30px);background:var(--ink);color:var(--paper);font:13px var(--mono);padding:10px 16px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;z-index:30}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clamp(16px,4vw,48px);border-top:1px solid var(--line)}
+@media (max-width:860px){.day,.form{grid-template-columns:1fr}.stagewrap{position:static}.edit{grid-template-columns:1fr}.logo small{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#diary">Із<small>дневник атмосферы дня</small></a>
+  <nav class="nav"><a href="#diary">Дневник</a><a href="#system">Визуальная система</a><a href="#new" class="cta">+ Записать день</a></nav>
+</header>
+<main>
+  <section id="v-diary" class="view" hidden>
+    <h1>Дневник</h1>
+    <p class="lead">Каждый день — отдельная папка: запись, фото, песня, воспоминание и озвучка. Все страницы подчиняются одной системе, но каждая выглядит по-своему — так, как ощущался день. <span id="count" class="mono"></span></p>
+    <div class="bar"><input id="search" type="search" placeholder="Найти день: «море», «мама», «осень»…"><select id="techFilter"><option value="">Все приёмы</option><option value="monet">Свет Моне</option><option value="kandinsky">Геометрия Кандинского</option><option value="matisse">Вырезки Матисса</option><option value="ma">Ма — пустота</option><option value="film">Плёнка</option></select><span class="mono dim" id="storeNote"></span></div>
+    <div id="feed" class="feed"></div>
+    <p style="margin-top:40px"><button id="resetDemo">Сбросить к демо</button></p>
+  </section>
+
+  <section id="v-day" class="view" hidden>
+    <div class="day">
+      <div class="stagewrap">
+        <canvas id="stage" width="720" height="1280"></canvas>
+        <div class="controls"><button id="play" class="primary">▶ Смотреть</button><button id="restart">↺</button><button id="voice">🗣 Озвучить</button><span id="time" class="mono dim"></span></div>
+        <div class="controls"><button id="record">● Видео .webm</button><button id="zip">⬇ Папка дня .zip</button></div>
+        <p id="songLink" class="mono"></p>
+      </div>
+      <div>
+        <p class="mono dim" id="dayMeta"></p>
+        <h1 id="dayTitle"></h1>
+        <p class="daytext" id="dayText"></p>
+        <div class="panel"><h3><span id="folderName"></span><span class="mono dim">папка дня</span></h3><ul class="folder" id="folder"></ul></div>
+        <div class="panel"><h3>Почему этот день выглядит так<span class="mono dim">объяснимая логика</span></h3><div class="palette" id="palette"></div><ul class="why" id="why"></ul></div>
+        <div class="panel"><h3>Что система прочитала во вводе</h3><div class="inputs" id="inputs"></div>
+          <p class="note">Оценка настроения — это художественная интерпретация для оформления, а не психологическая или медицинская диагностика.</p></div>
+        <div class="panel"><h3>Правка</h3>
+          <div class="edit"><div><span class="lab">Название папки</span><input id="titleEdit"></div>
+          <div><span class="lab">Приём</span><select id="techPick"><option value="">Автоматически (по правилам)</option><option value="monet">Свет Моне</option><option value="kandinsky">Геометрия Кандинского</option><option value="matisse">Вырезки Матисса</option><option value="ma">Ма — пустота</option><option value="film">Плёнка</option></select></div>
+          <button id="rebuild">Пересобрать</button></div>
+          <p style="margin-top:16px"><button id="delete">Удалить день</button></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-new" class="view" hidden>
+    <h1>Как прошёл день?</h1>
+    <p class="lead">Расскажите так, как рассказали бы близкому другу: погода, свет, запахи, звуки, кто был рядом. Добавьте фото и песню, которая звучала, — из этого соберётся страница дневника.</p>
+    <form id="newForm" class="form" novalidate>
+      <div>
+        <div class="field"><label for="fText">Запись</label><textarea id="fText" placeholder="Гуляли по парку, всё в жёлтых листьях, было холодно, но мы пили какао и долго разговаривали…"></textarea></div>
+        <div class="field"><span class="lab">Фото дня</span>
+          <label class="drop" id="dropzone"><input id="fPhotos" type="file" accept="image/*" multiple>Перетащите фото сюда или нажмите, чтобы выбрать<br><span class="mono dim">одно или несколько; можно сразу бросить и аудиофайл</span></label>
+          <div class="thumbs" id="thumbs"></div></div>
+        <div class="row"><div class="field"><label for="fDate">Дата и время</label><input id="fDate" type="datetime-local"></div>
+          <div class="field"><label for="fTitle">Название (необязательно)</label><input id="fTitle" placeholder="придумаем сами"></div></div>
+      </div>
+      <div>
+        <div class="field"><span class="lab">Песня дня</span>
+          <div class="seg"><label><input type="radio" name="songKind" value="link" checked><span>Ссылка</span></label><label><input id="kFile" type="radio" name="songKind" value="file"><span>Свой аудиофайл</span></label></div>
+          <div id="songLinkBox"><input id="fUrl" type="url" placeholder="https://open.spotify.com/… · YouTube · Яндекс Музыка"><p class="note">Чужая песня не скачивается и не хранится: сохраняем ссылку, а влияние на оформление считаем по описанию ниже.</p></div>
+          <div id="songFileBox" hidden><input id="fAudio" type="file" accept="audio/*"><p class="note">Файл анализируется прямо в браузере: темп, тональность (мажор/минор), энергия, огибающая громкости.</p></div>
+        </div>
+        <div class="row"><div class="field"><label for="fArtist">Исполнитель</label><input id="fArtist" placeholder="Frank Sinatra"></div><div class="field"><label for="fSong">Название</label><input id="fSong" placeholder="Autumn in New York"></div></div>
+        <div class="row"><div class="field"><label for="fGenre">Жанр</label><input id="fGenre" placeholder="джаз, техно, фолк, поп…"></div><div class="field"><label for="fYear">Год</label><input id="fYear" inputmode="numeric" placeholder="1957"></div></div>
+        <div class="row"><div class="field"><label for="fTempo">Темп (для ссылки)</label><select id="fTempo"><option value="slow">медленный</option><option value="mid" selected>средний</option><option value="fast">быстрый</option></select></div>
+          <div class="field"><label for="fMood">Характер (для ссылки)</label><select id="fMood"><option value="">не знаю</option><option value="light">светлая, мажор</option><option value="dark">грустная, минор</option></select></div></div>
+        <p class="err" id="formErr"></p>
+        <button id="make" class="primary" type="submit">Собрать воспоминание дня →</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="v-system" class="view" hidden>
+    <h1>Визуальная система</h1>
+    <p class="lead">Дневник — серия, а не набор картинок. Постоянный слой делает ленту цельной, переменный — передаёт ощущение конкретного дня. Каждое решение выводится из ввода по явным правилам и показывается на странице дня.</p>
+    <div class="rules">
+      <p><b>Формат.</b> Вертикальная страница 9:16 (720×1280), живая: 15–45 секунд движения под песню, экспорт в .webm и обложка .png.</p>
+      <p><b>Постоянные элементы.</b> Бумага с волокнами; шапка «ІЗ · № дня» и дата моноширинным; зона фото 632×780 в одном месте; название — Cormorant Garamond или Unbounded; подпись — цитата из записи; полоса музыки — огибающая громкости песни с плейхедом; «компас дня» — точка настроения в круге (по горизонтали свет/тень, по вертикали тихо/ярко); нижняя линейка с координатами V/A/W.</p>
+      <p><b>Переменные элементы.</b> Приём обработки фото, палитра, сдвиг тепла, насыщенность, «воздух» (поля), ритм смены кадров, тип перехода, зерно, начертание названия и подписи, голос озвучки.</p>
+      <p><b>Координаты настроения.</b> Валентность V = 55% текст + 27% песня (лад, жанр) + 18% фото (свет, цвет). Энергия A = 42% текст + 43% песня (темп, плотность атак, громкость) + 15% фото (насыщенность, контраст). Тепло W — из фото, сезона, времени суток и жанра.</p>
+      <p><b>Песня управляет движением.</b> Кадр меняется каждые 8/12/16 долей (чем энергичнее день, тем чаще); у Кандинского — жёсткая нарезка в долю; у Матисса формы пружинят на сильную долю; медленная песня даёт длинные растворения и широкие поля. Минор приглушает свет, мажор открывает. Чем старше песня, тем больше зерна.</p>
+      <p><b>Названия папок.</b> Именная фраза 3–7 слов, без глаголов и эмодзи, по одной схеме: [сезон/настроение] + [место или время] + [деталь, люди или событие] — «Осенний парк и какао», «Ночь в офисе перед сдачей».</p>
+      <p><b>Голос.</b> Выбирается по приёму и координатам: тёплый и медленный для спокойных дней, живой и быстрый для насыщенных, чёткий для напряжённых, мягкий для ностальгии. Темп речи 0.8–1.15, высота от валентности.</p>
+      <p><b>Против «грустно — значит синий».</b> Приём выбирается не по одному слову: у каждого из пяти приёмов есть балл, складывающийся из координат, места, людей, погоды, эпохи песни и её звучания; второй по силе приём добавляет акцент.</p>
+    </div>
+    <h2 style="margin-top:30px">Художественные приёмы</h2>
+    <div class="techlist" id="techList"></div>
+  </section>
+</main>
+<footer>Із · прототип для Genesis Hackathon / ArtTech · всё считается локально в браузере · демо-фото нарисованы процедурно, демо-музыка синтезирована прототипом · шрифты Google Fonts (OFL), JSZip (MIT)</footer>
+<div class="loader" id="loader" hidden><div class="dot"></div><span id="loaderText">Готовлю дневник…</span></div>
+<div class="toast" id="toast"></div>
+<script src="js/analyze.js"></script>
+<script src="js/system.js"></script>
+<script src="js/render.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
