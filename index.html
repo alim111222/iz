@@ -729,11 +729,12 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
         const base = cover(img, zw, zh), bx = base.getContext('2d', { willReadFrequently: true });
         const data = bx.getImageData(0, 0, zw, zh).data;
         const c = mk(zw, zh), x = c.getContext('2d');
-        x.filter = 'blur(10px) saturate(1.2)'; x.drawImage(base, 0, 0); x.filter = 'none';
-        x.fillStyle = rgba(P.palette[0], 0.12); x.fillRect(0, 0, zw, zh);
+        // основа — само фото (мягко), чтобы лица и детали читались; мазки ложатся поверх
+        x.filter = 'blur(3px) saturate(1.15)'; x.drawImage(base, 0, 0); x.filter = 'none';
+        x.fillStyle = rgba(P.palette[0], 0.08); x.fillRect(0, 0, zw, zh);
         const lumAt = (px, py) => { px = clamp(px | 0, 0, zw - 1); py = clamp(py | 0, 0, zh - 1); const i = (py * zw + px) * 4; return data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11; };
         x.lineCap = 'round';
-        const passes = [[1400, 11, 26], [4200, 6, 15], [3000, 3.5, 9]];
+        const passes = [[1200, 9, 20], [3800, 5, 12], [3000, 3, 7.5]];
         for (const [n, wid, len] of passes) for (let i = 0; i < n; i++) {
           const px = r() * zw, py = r() * zh, ii = ((py | 0) * zw + (px | 0)) * 4;
           let cr = data[ii], cg = data[ii + 1], cb = data[ii + 2];
@@ -741,11 +742,15 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
           const j = (r() - 0.5) * 26; cr += j; cg += j * 0.8; cb += j * 0.5;
           const gx = lumAt(px + 3, py) - lumAt(px - 3, py), gy = lumAt(px, py + 3) - lumAt(px, py - 3);
           const ang = Math.atan2(gy, gx) + Math.PI / 2 + (r() - 0.5) * 0.6, l = len * (0.6 + r() * 0.7);
-          x.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${0.55 + r() * 0.4})`; x.lineWidth = wid * (0.7 + r() * 0.6);
+          // на контурах (лица, глаза, края предметов) мазок почти прозрачный — деталь сохраняется
+          const edge = Math.min(1, Math.hypot(gx, gy) / 55);
+          const al = (0.55 + r() * 0.35) * (1 - 0.9 * edge);
+          if (al < 0.06) continue;
+          x.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${al})`; x.lineWidth = wid * (0.7 + r() * 0.6);
           x.beginPath(); x.moveTo(px - Math.cos(ang) * l / 2, py - Math.sin(ang) * l / 2);
           x.quadraticCurveTo(px + (r() - 0.5) * 4, py + (r() - 0.5) * 4, px + Math.cos(ang) * l / 2, py + Math.sin(ang) * l / 2); x.stroke();
         }
-        out.painted = c;
+        out.painted = c; out.sharp = base;
         out.light = { x: 0.2 + r() * 0.6, y: 0.15 + r() * 0.4 };
       } else if (tech === 'kandinsky') {
         const base = cover(img, zw, zh), bx = base.getContext('2d', { willReadFrequently: true });
@@ -803,7 +808,11 @@ footer{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px clam
   function drawMonet(x, f, t, p, P, bEnv) {
     const zw = ZONE.w, zh = ZONE.h, s = 1.02 + p * 0.06;
     x.save(); x.translate(zw / 2, zh / 2); x.scale(s, s); x.translate(-zw / 2 + (p - 0.5) * 14, -zh / 2);
-    x.drawImage(f.painted, 0, 0); x.restore();
+    x.drawImage(f.painted, 0, 0);
+    // воспоминание «проясняется»: к середине кадра проступает чёткое фото
+    const rev = 0.62 * Math.sin(Math.PI * Math.min(1, p * 1.25)) ** 2;
+    if (f.sharp && rev > 0.01) { x.globalAlpha *= rev; x.drawImage(f.sharp, 0, 0); }
+    x.restore();
     // дрожащий свет
     const lx = (f.light.x + Math.sin(t * 0.4) * 0.05) * zw, ly = (f.light.y + Math.cos(t * 0.3) * 0.04) * zh;
     const g = x.createRadialGradient(lx, ly, 10, lx, ly, zw * 0.7);
